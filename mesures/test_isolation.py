@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import json
 import os
+import platform
 import re
 import shlex
 import shutil
@@ -35,6 +36,50 @@ RACINE = Path(__file__).resolve().parent.parent
 __all__ = ["eprouver_isolement", "eprouver_tous"]
 
 SENTINELLE_CONTENU = b"sentinel-constant-32-bytes!!"
+
+def _est_conteneur() -> bool:
+    """Détecte si l'exécution se fait dans un conteneur."""
+    try:
+        if Path("/.dockerenv").is_file():
+            return True
+    except OSError:
+        pass
+
+    try:
+        cgroup = Path("/proc/1/cgroup")
+        if cgroup.is_file() and ("docker" in cgroup.read_text() or "containerd" in cgroup.read_text()):
+            return True
+    except OSError:
+        pass
+
+    try:
+        if os.environ.get("container") is not None:
+            return True
+    except Exception:
+        pass
+
+    return False
+
+def _plateforme() -> Dict[str, Any]:
+    """Retourne les informations sur la plateforme d'exécution."""
+    systeme = platform.system()
+    version = platform.release()
+    machine = platform.machine()
+    python_version = platform.python_version()
+    conteneur = _est_conteneur()
+
+    libelle = systeme + (' ' + version if systeme == 'Windows' else '')
+    if conteneur:
+        libelle += ' (conteneur)'
+
+    return {
+        "systeme": systeme,
+        "version": version,
+        "machine": machine,
+        "python": python_version,
+        "conteneur": conteneur,
+        "libelle": libelle
+    }
 
 def _strip_accents(s: str) -> str:
     return "".join(
@@ -1191,6 +1236,7 @@ except ValueError:
         reseau_report = [{"famille": f, "type": t} for f, t in sockets]
 
         report_dict: Dict[str, Any] = {
+            "plateforme": _plateforme(),
             "chemin": str(chemin_outil),
             "verdict": verdict,
             "details": details,
@@ -1232,6 +1278,7 @@ def eprouver_tous(chemins: List[Path], delai: float, controle_positif: Mapping[s
             rapport = eprouver_isolement(p, delai, controle_positif)
         except Exception as exc:
             rapport = {
+                "plateforme": _plateforme(),
                 "chemin": str(p),
                 "verdict": "NON EPROUVE",
                 "details": [],
@@ -1293,6 +1340,7 @@ def eprouver_tous(chemins: List[Path], delai: float, controle_positif: Mapping[s
         lot_suspect = True
 
     return {
+        "plateforme": _plateforme(),
         "denominateur": denom_total,
         "par_verdict": par_verdict,
         "rapports": rapports,

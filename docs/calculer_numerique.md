@@ -48,3 +48,4 @@ mpmath, numpy, sympy — absentes, l'outil travaille en mode dégradé et le dit
 
 ---
 [← retour à la liste](../README.md)
+

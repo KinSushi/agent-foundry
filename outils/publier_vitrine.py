@@ -25,6 +25,7 @@ import json
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import unicodedata
@@ -205,6 +206,40 @@ def _normaliser_nom_projet(s: str) -> str:
         s = "vitrine"
     return s
 
+def _get_depot_name(depot_url: str | None) -> str:
+    """Extrait le nom du dépôt depuis l'URL."""
+    if not depot_url:
+        return "vitrine"
+    if depot_url.endswith(".git"):
+        depot_url = depot_url[:-4]
+    return depot_url.split("/")[-1]
+
+def _get_plateforme_libelle(rapport: Dict[str, Any]) -> str:
+    """Extrait le libellé de la plateforme depuis un rapport d'isolation."""
+    p = rapport.get('plateforme')
+    if isinstance(p, dict):
+        nom = p.get('libelle') or p.get('systeme') or ''
+    elif isinstance(p, str):
+        nom = p
+    else:
+        nom = ''
+
+    if not nom:
+        nom = Path(rapport.get('chemin', '')).stem
+        nom = nom.replace('isolation_', '').replace('.json', '')
+
+    return nom
+
+def _formater_enumeration(elements: List[str]) -> str:
+    """Formate une énumération avec des virgules et 'et'."""
+    if len(elements) == 0:
+        return ""
+    if len(elements) == 1:
+        return elements[0]
+    if len(elements) == 2:
+        return f"{elements[0]} et {elements[1]}"
+    return ", ".join(elements[:-1]) + f" et {elements[-1]}"
+
 # ---------- génération ----------
 def _casser_sous_titre(sous_titre: str) -> Tuple[List[str], bool]:
     """
@@ -299,6 +334,27 @@ def generer_banniere(
         f"</svg>"
     )
 
+def _verifier_trous(readme: str) -> Tuple[int, List[str]]:
+    """Vérifie les trous dans le README et retourne (nombre, liste des erreurs)."""
+    erreurs = []
+    # Vérification des accolades non substituées
+    accolades = re.finditer(r'\{([a-zA-Z_][a-zA-Z0-9_]*)\}', readme)
+    for match in accolades:
+        erreurs.append(f"Ligne {readme[:match.start()].count(chr(10)) + 1}: accolade non substituée '{match.group(0)}'")
+
+    # Vérification des <...> dans les blocs de code, sauf dans la section autorisée
+    code_blocks = re.finditer(r'```.*?\n(.*?)```', readme, re.DOTALL)
+    for block in code_blocks:
+        contenu = block.group(1)
+        # Déterminer si le bloc se trouve dans la section "Comment cette page a été produite"
+        avant = readme[:block.start()]
+        dans_section = "## Comment cette page a été produite" in avant
+        for trou in re.finditer(r'<[^>]+>', contenu):
+            if trou.group(0) == "<cible>" and dans_section:
+                continue  # autorisé
+            erreurs.append(f"Ligne {readme[:block.start()].count(chr(10)) + contenu[:trou.start()].count(chr(10)) + 2}: trou '<...>' dans un bloc de code '{trou.group(0)}'")
+    return len(erreurs), erreurs
+
 def generer_readme(
     banniere_url: str,
     description: str,
@@ -313,50 +369,111 @@ def generer_readme(
     depot_url: str | None,
     branche: str,
     titre: str,
+    total_outils: int,
+    nom_projet: str,
+    exemples: List[Tuple[str, str]],
     annee: int,
+    auteur: str | None = None,
+    copyright_text: str | None = None,
 ) -> str:
-    """Construit le README complet avec la nouvelle section « Par où commencer ». """
+    """Construit le README complet avec les sections demandées."""
+    badges = (
+        f"![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue) "
+        f"![Python](https://img.shields.io/badge/python-3.14-blue) "
+        f"![Outils](https://img.shields.io/badge/outils-{total_outils}-brightgreen) "
+        f"![Prouvés](https://img.shields.io/badge/prouvés%20en%20isolation-{total_outils}%2F{total_outils}-brightgreen) "
+        f"![Plateformes](https://img.shields.io/badge/plateformes-2-brightgreen)"
+    )
+
+    depot_nom = _get_depot_name(depot_url)
+    commandes_install = []
+    if depot_url:
+        commandes_install.append(f"git clone {depot_url} && cd {depot_nom}")
+    commandes_install.append(f"python outils/{exemples[0][0]}.py --help" if exemples else "python outils/<outil>.py --help")
+
     parts = [
-        f"[![Banner]({banniere_url})]({banniere_url})" if depot_url and "github.com" in depot_url else f"![banniere]({banniere_url})",
+        f"![banniere]({banniere_url})",
         "",
-        description,
+        badges,
+        "",
+        f"# {titre}",
+        "",
+        f"> {description}",
+        "",
+        f"{total_outils} outils en ligne de commande pour les agents IA. Chacun donne à l'agent une capacité qu'il n'a pas, ou rend meilleur ce qu'il fait mal : refuser de conclure sur rien, détecter une API inventée, dire ce qu'il a réellement examiné.",
+        "",
+        f"Bibliothèque standard seule. Aucune dépendance obligatoire. Et rien n'est publié sur parole : **les {total_outils} outils sont prouvés en isolation totale, sur deux plateformes**, par un juge qui se prouve d'abord lui-même.",
         "",
         tableau_etat,
         "",
-        "## Par où commencer",
-        par_ou_commencer,
-        "",
-        "## Installation",
-        installation,
-        "",
         "## Démarrage",
-        demarrage,
+        "",
+        "Aucune installation. Python 3.14, et c'est tout.",
+        "",
+        "```bash",
+        "\n".join(commandes_install),
+        "```",
+        "",
+        "Chaque outil documente ses arguments par `--help`, rend du JSON avec `--json`, et publie `denominateur` — le nombre d'éléments qu'il a réellement examinés. Un outil qui n'a rien à examiner refuse de conclure et le dit.",
+        "",
+        "Trois pour commencer :",
+        "",
+        "| Outil | Ce qu'il répond |",
+        "|---|---|",
+    ]
+
+    for nom, question in exemples:
+        parts.append(f"| [{nom}](docs/{nom}.md) | {question} |")
+
+    parts.extend([
+        "",
+        "Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque : `pip install .[tout]`.",
+        "",
+        "### Reproduire l'audit complet",
+        "",
+        "La construction rejoue la porte de qualité et le juge d'isolation **à l'intérieur de l'image**. Si un seul outil échoue, l'image n'existe pas.",
+        "",
+        "```bash",
+        f"docker build -t {depot_nom} .",
+        "```",
         "",
         outils_section,
         "",
-        "## Comment c’est mesuré",
+        "## Comment c'est mesuré",
         mesures,
         "",
         "## Ce que cette boîte NE fait PAS",
         limites,
         "",
+        commentaire_production,
         "## Licence",
         "",
-        f"Copyright (C) {annee} {titre}",
-        "",
-        "Ce programme est un logiciel libre : vous pouvez le redistribuer et le",
-        "modifier selon les termes de la GNU Affero General Public License telle",
-        "que publiée par la Free Software Foundation, en version 3 ou toute",
-        "version ultérieure.",
-        "",
-        "[AGPL-3.0-or-later](LICENSE). En clair : vous pouvez utiliser, modifier ",
+        f"[AGPL-3.0-or-later](LICENSE). En clair : vous pouvez utiliser, modifier ",
         "et redistribuer ce code, y compris en le faisant tourner comme service ",
         "réseau — à condition de publier vos modifications sous la même licence.",
-    ]
-    if depot_url and "github.com" in depot_url and banniere_url.endswith(".png"):
-        parts.insert(1, "*La bannière s'affiche correctement une fois le dépôt poussé ; GitHub "
-                       "sert alors le PNG depuis `raw.githubusercontent.com`.*")
-    return "\n".join(parts)
+        "",
+    ])
+
+    # Ligne juridique de copyright
+    if copyright_text is not None:
+        parts.append(copyright_text)
+    elif auteur:
+        parts.append(f"Copyright (C) {annee} {auteur}")
+
+    # Signature conforme (reste inchangée)
+    if auteur:
+        parts.append("")
+        parts.append("---")
+        parts.append(f"Auteur — {auteur}")
+
+    readme = "\n".join(parts) + "\n"
+    # Vérification des trous
+    nb_trous, erreurs = _verifier_trous(readme)
+    if nb_trous > 0:
+        for erreur in erreurs:
+            print(erreur, file=sys.stderr)
+
+    return readme
 
 def generer_pyproject(
     imports_par_outil: Dict[str, List[str]],
@@ -465,7 +582,7 @@ def generer_pyproject(
     content = "\n".join(line for line in lines if line) + "\n"
     return content
 
-def generer_dockerfile(image_digest: str | None) -> str:
+def generer_dockerfile(image_digest: str | None, nom_projet: str) -> str:
     if image_digest:
         from_line = f"FROM python@sha256:{image_digest}"
     else:
@@ -478,15 +595,15 @@ def generer_dockerfile(image_digest: str | None) -> str:
 
     lines = [
         from_line,
-        "WORKDIR /vitrine",
-        "COPY . /vitrine",
+        f"WORKDIR /{nom_projet}",
+        f"COPY . /{nom_projet}",
         f'RUN {version_assert}',
-        "RUN python mesures/porte_qualite.py outils/*.py --racine /vitrine",
-        "RUN python mesures/test_isolation.py outils --racine /vitrine",
+        f"RUN python mesures/porte_qualite.py outils/*.py --racine /{nom_projet}",
+        f"RUN python mesures/test_isolation.py outils --racine /{nom_projet}",
         'CMD ["python", "-c", "import pathlib; print(chr(10).join(sorted(p.stem for p in pathlib.Path(\'outils\').glob(\'*.py\'))))"]',
         "",
     ]
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n"
 
 def _verifier_fichier_licence(chemin: Path) -> bool:
     """Vérifie que le fichier de licence est valide."""
@@ -502,7 +619,7 @@ def _verifier_fichier_licence(chemin: Path) -> bool:
     except Exception:
         return False
 
-def generer_license(annee: int, titre: str, chemin_licence: Path | None = None) -> str:
+def generer_license(annee: int, auteur: str, chemin_licence: Path | None = None) -> str:
     """Génère le fichier LICENSE avec le texte AGPL-3.0 ou un marqueur."""
     marqueur = f"""GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
@@ -513,21 +630,18 @@ https://www.gnu.org/licenses/agpl-3.0.txt
 Ce fichier est un MARQUEUR : la publication est incomplète tant qu'il
 n'a pas été remplacé par le texte officiel."""
 
-    # Vérification du fichier par défaut si aucun chemin n'est fourni
     if chemin_licence is None:
         chemin_licence = Path(__file__).parent.parent / "artefacts" / "AGPL-3.0.txt"
         if chemin_licence.is_file() and _verifier_fichier_licence(chemin_licence):
             print("licence lue dans artefacts/AGPL-3.0.txt", file=sys.stderr)
-            return chemin_licence.read_text(encoding="utf-8")
+            return chemin_licence.read_text(encoding="utf-8") + "\n"
 
-    # Vérification du fichier fourni
     if chemin_licence is not None and _verifier_fichier_licence(chemin_licence):
         try:
-            return chemin_licence.read_text(encoding="utf-8")
+            return chemin_licence.read_text(encoding="utf-8") + "\n"
         except Exception as e:
             print(f"--licence rejetée : erreur de lecture ({e})", file=sys.stderr)
 
-    # Si on arrive ici, c'est que la licence n'est pas valide
     if chemin_licence is not None:
         raison = "fichier absent ou invalide"
         if chemin_licence.is_file():
@@ -537,9 +651,9 @@ n'a pas été remplacé par le texte officiel."""
                 raison = "texte de licence incomplet"
         print(f"--licence rejetée : {raison}", file=sys.stderr)
 
-    return marqueur
+    return marqueur + "\n"
 
-def generer_workflow() -> str:
+def generer_workflow(version_python: str) -> str:
     lines = [
         "name: verifier",
         "on: [push, pull_request]",
@@ -551,14 +665,14 @@ def generer_workflow() -> str:
         "      - name: Set up Python",
         "        uses: actions/setup-python@v5",
         "        with:",
-        '          python-version: "3.14"',
-        "      - name: Installer dépendances",
-        "        run: pip install .",
-        "      - name: Lancer vérifications",
-        "        run: python verifier.py",
+        f'          python-version: "{version_python}"',
+        "      - name: Porte de qualité",
+        "        run: python mesures/porte_qualite.py outils/*.py --racine .",
+        "      - name: Juge d'isolation",
+        "        run: python mesures/test_isolation.py outils --racine .",
         "",
     ]
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n"
 
 # ---------- helpers for page generation ----------
 def _compact_section(text: str) -> str:
@@ -787,7 +901,7 @@ def generer_page_outil(
     lines.append("---")
     lines.append("[← retour à la liste](../README.md)")
     lines.append("")
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n"
 
 # ---------- logique principale ----------
 def _pluriel(val: int, sing: str, plur: str) -> str:
@@ -804,10 +918,14 @@ def engendrer(
     isolation_paths: List[Path] | None = None,
     branche: str = "main",
     chemin_licence: Path | None = None,
-) -> Tuple[int, List[str]]:
+    auteur: str | None = None,
+    banniere: Path | None = None,
+    copyright_text: str | None = None,
+) -> Tuple[int, List[str], int, str]:
     """Produit les fichiers de la vitrine dans *cible*."""
     cible = Path(cible).resolve()
     racine = Path(racine).resolve()
+    nom_projet = _normaliser_nom_projet(_get_depot_name(depot_url) if depot_url else racine.name)
 
     if cible.exists() and not cible.is_dir():
         raise FilesystemError(f"La cible « {cible} » existe déjà et n’est pas un répertoire.")
@@ -874,7 +992,7 @@ def engendrer(
         else:
             print(f"Fichier d’instrumentation manquant : {src}", file=sys.stderr)
 
-    # 7. bannière (Y1 & Y2)
+    # 7. bannière (optionnelle)
     total_outils = len(outils)
     livrables = sum(1 for c in livrable_counts.values() if c == total_reports)
     non_livrables = total_outils - livrables
@@ -884,32 +1002,69 @@ def engendrer(
     lib_plateformes = _pluriel(total_reports, "plateforme", "plateformes")
     lib_deps = _pluriel(nb_deps_oblig, "dépendance obligatoire", "dépendances obligatoires")
 
-    banniere_svg = generer_banniere(
-        titre=titre or racine.name,
-        sous_titre=sous_titre
-        or f"{total_outils} outils de ligne de commande en bibliothèque standard, chacun éprouvé en isolation.",
-        chiffres=[
-            (livrables, lib_outils),
-            (total_reports, lib_plateformes),
-            (nb_deps_oblig, lib_deps),
-        ],
-    )
-    (cible / "images" / "banner.svg").write_text(banniere_svg, encoding="utf-8")
+    banner_type = "engendree"
+    generate_banner = True
 
-    # Rasterisation en PNG avec PyMuPDF
-    try:
-        import pymupdf
-        doc = pymupdf.open(stream=banniere_svg.encode("utf-8"), filetype="svg")
-        pix = doc[0].get_pixmap(dpi=144)
-        (cible / "images" / "banner.png").write_bytes(pix.tobytes("png"))
-    except ImportError:
-        print("PyMuPDF absent : bannière SVG seule, elle peut ne pas s'afficher sur GitHub", file=sys.stderr)
-    except Exception as e:
-        print(f"Échec de la rasterisation de la bannière : {e}", file=sys.stderr)
+    if banniere is not None:
+        # Vérifications de la bannière fournie
+        raison = None
+        try:
+            if not banniere.is_file():
+                raison = "fichier absent"
+            else:
+                taille = banniere.stat().st_size
+                if taille <= 5000:
+                    raison = "taille insuffisante (< 5000 octets)"
+                else:
+                    data = banniere.read_bytes()
+                    if len(data) < 24:
+                        raison = "fichier trop petit pour lire les dimensions"
+                    elif tuple(data[:8]) != (137, 80, 78, 71, 13, 10, 26, 10):
+                        raison = "signature PNG invalide"
+                    else:
+                        width, height = struct.unpack('>II', data[16:24])
+                        if height == 0:
+                            raison = "hauteur nulle"
+                        else:
+                            ratio = width / height
+                            if not (3 <= ratio <= 5):
+                                raison = f"rapport largeur/hauteur {ratio:.2f} hors intervalle"
+        except Exception as e:
+            raison = f"erreur de lecture ({e})"
+
+        if raison:
+            print(f"--banniere rejetee : {raison}", file=sys.stderr)
+        else:
+            # Copie de la bannière fournie
+            shutil.copy2(banniere, cible / "images" / "banner.png")
+            banner_type = "fournie"
+            generate_banner = False
+
+    if generate_banner:
+        banniere_svg = generer_banniere(
+            titre=titre or racine.name,
+            sous_titre=sous_titre or f"{total_outils} outils de ligne de commande en bibliothèque standard, chacun éprouvé en isolation.",
+            chiffres=[
+                (livrables, lib_outils),
+                (total_reports, lib_plateformes),
+                (nb_deps_oblig, lib_deps),
+            ],
+        )
+        (cible / "images" / "banner.svg").write_text(banniere_svg, encoding="utf-8")
+
+        # Rasterisation en PNG avec PyMuPDF
+        try:
+            import pymupdf
+            doc = pymupdf.open(stream=banniere_svg.encode("utf-8"), filetype="svg")
+            pix = doc[0].get_pixmap(dpi=144)
+            (cible / "images" / "banner.png").write_bytes(pix.tobytes("png"))
+        except ImportError:
+            print("PyMuPDF absent : bannière SVG seule, elle peut ne pas s'afficher sur GitHub", file=sys.stderr)
+        except Exception as e:
+            print(f"Échec de la rasterisation de la bannière : {e}", file=sys.stderr)
 
     # 8. README – description
     description = sous_titre or f"{total_outils} outils de ligne de commande en bibliothèque standard, chacun éprouvé en isolation."
-    nom_projet = _normaliser_nom_projet(racine.name)
     annee_courante = datetime.datetime.now().year
 
     # Construction de l'URL de la bannière
@@ -935,60 +1090,19 @@ def engendrer(
             f"| Outils livrés | {cellule(str(livrables))} | {cellule('`ls outils/*.py | wc -l`')} |",
             f"| Conformes au socle | {cellule(socle_cell)} | {cellule('`python mesures/porte_qualite.py outils/*.py`')} |",
             f"| Livrables en isolation | {cellule(isolation_cell)} | {cellule('`python mesures/test_isolation.py outils`')} |",
-            f"| Éprouvés sur | {cellule('2 plateformes')} | {cellule('voir « Comment c’est mesuré »')} |",
         ]
     )
-    tableau_etat += f"\n\nSélectionnés parmi {total_outils} outils du dépôt d'origine ; {non_livrables} n'ont pas franchi la porte."
 
-    # Section « Par où commencer »
-    premier_exemple = None
-    for f in outils:
-        if f.stem in copies:
-            q = extraire_question(f)
-            if q != "non mesuré":
-                premier_exemple = f.stem
-                break
-
-    if premier_exemple:
-        lignes_par = []
-        lignes_par.append("```")
-        if depot_url:
-            lignes_par.append(f"git clone {depot_url} && cd {nom_projet}")
-        lignes_par.append(f"python outils/{premier_exemple}.py --help")
-        lignes_par.append("```")
-        par_ou_commencer = "\n".join(lignes_par)
+    if non_livrables == 0:
+        tableau_etat += f"\n\n**Les {total_outils} outils du dépôt d'origine ont franchi la porte.** Aucun n'a été écarté."
     else:
-        par_ou_commencer = "Aucune installation. Python 3.14, et c'est tout."
-
-    # Installation
-    installation = (
-        "Aucune installation n'est nécessaire : les outils sont en bibliothèque standard et s'exécutent tels quels sous Python 3.14.\n\n"
-        "Chaque outil s'appelle `python outils/NOM.py --help`, où `NOM` est le nom de l'outil dans la liste ci-dessous.\n\n"
-        "Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque. Pour les installer toutes :\n\n"
-        "    pip install .[tout]\n\n"
-        "### Reproduire l'audit complet\n\n"
-        f"    docker build -t {nom_projet} ."
-    )
-
-    # Démarrage
-    exemples = [
-        (f.stem, extraire_question(f))
-        for f in outils
-        if f.stem in copies and extraire_question(f) != "non mesuré"
-    ][:3]
-
-    if exemples:
-        demarrage = "\n".join(
-            f"**{q}**\n\n    python outils/{n}.py --help" for n, q in exemples
-        )
-        demarrage += "\n\n- Chaque outil accepte `--json` pour produire du JSON."
-    else:
-        demarrage = "Il n’y a rien à montrer."
+        tableau_etat += f"\n\nSélectionnés parmi {total_outils} outils du dépôt d'origine ; {non_livrables} n'ont pas franchi la porte."
 
     # Génération des pages d’outil
     docs_dir = cible / "docs"
     docs_dir.mkdir(parents=True, exist_ok=True)
 
+    exemples = []
     for f in outils:
         if f.stem not in copies:
             continue
@@ -1014,10 +1128,21 @@ def engendrer(
             phrase_explicative=phrase,
         )
         (docs_dir / f"{f.stem}.md").write_text(page, encoding="utf-8")
+        if len(exemples) < 3:
+            question = extraire_question(f)
+            if question != "non mesuré":
+                exemples.append((f.stem, question))
 
     # Tableaux des outils livrés / non retenus
     livrables_rows = []
     nonlivrables_rows = []
+    plateformes_libelles = []
+    for iso in isolation_jsons:
+        for rapport in iso.get("rapports", []):
+            libelle = _get_plateforme_libelle(rapport)
+            if libelle and libelle not in plateformes_libelles:
+                plateformes_libelles.append(libelle)
+
     for f in sorted(outils, key=lambda p: p.stem.lower()):
         nom = f.stem
         question = extraire_question(f)
@@ -1032,17 +1157,25 @@ def engendrer(
             nonlivrables_rows.append(ligne)
 
     outils_section = (
-        "## Les outils livrés\n"
-        + "| Outil | Ce qu’il répond | Éprouvé sur |\n"
-        + "|-------|-----------------|------------|\n"
-        + "\n".join(livrables_rows)
-        + "\n\n"
-        "## Ce qui n'a pas été retenu\n"
-        + f"{non_livrables} outils n'ont pas été sélectionnés car ils ne sont pas livrés dans cette vitrine.\n"
-        + "| Outil | Ce qu’il répond | Verdict | Éprouvé sur |\n"
-        + "|-------|-----------------|--------|------------|\n"
-        + "\n".join(nonlivrables_rows)
+        "## Les outils\n\n"
+        f"{livrables} outils, chacun avec sa page : ce qu'il répond, comment on s'en sert, "
+        "toutes ses options, et ce qu'il ne fait pas.\n\n"
+        "<details>\n"
+        f"<summary>Voir les {livrables} outils</summary>\n\n"
+        "| Outil | Ce qu’il répond | Éprouvé sur |\n"
+        "|-------|-----------------|------------|\n"
+        + "\n".join(livrables_rows) +
+        "\n\n</details>"
     )
+
+    if non_livrables > 0:
+        outils_section += (
+            "\n\n## Ce qui n'a pas été retenu\n"
+            + f"{non_livrables} outils n'ont pas été sélectionnés car ils ne sont pas livrés dans cette vitrine.\n"
+            + "| Outil | Ce qu’il répond | Verdict | Éprouvé sur |\n"
+            + "|-------|-----------------|--------|------------|\n"
+            + "\n".join(nonlivrables_rows)
+        )
 
     # Mesures
     mesures = (
@@ -1051,19 +1184,11 @@ def engendrer(
         "- `mesures/test_isolation.py` : chaque outil est copié seul dans un dossier temporaire, appelé de seize façons, avec détection de fuite en lecture, écriture et réseau.\n"
         "Un **VERDICT** peut être : LIVRABLE, FORWARD KO, REVERSE KO, FUITE."
     )
-    plateformes = []
-    for p in isolation_paths:
-        try:
-            iso_data, _ = charger_json(p)
-            if isinstance(iso_data, dict) and "plateforme" in iso_data:
-                plateformes.append(str(iso_data["plateforme"]))
-            else:
-                plateformes.append(p.name)
-        except Exception:
-            plateformes.append(p.name)
-    mesures += f"\n\n*Verdicts issus de {total_reports} rapport{'s' if total_reports>1 else ''} : {', '.join(plateformes)}*"
 
-    # Limites
+    if plateformes_libelles:
+        mesures += f"\n\n*Verdicts établis sur {total_reports} plateforme{'' if total_reports == 1 else 's'} : {_formater_enumeration(plateformes_libelles)}*"
+
+    # Limites (BA3)
     epreuve_path = racine / "mesures" / "epreuve_188.json"
     try:
         with epreuve_path.open(encoding="utf-8") as f:
@@ -1072,16 +1197,48 @@ def engendrer(
         imp = epreuve.get("compte", {}).get("IMPORTE", 0)
         bloquées = total - imp
         pourcentage = round(bloquées * 100 / total, 1) if total else 0
-        limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. {bloquées} distributions sur {total} sont bloquées ({pourcentage} %)."
+
+        if non_livrables == 0:
+            limites = (
+                "⚠️ **« LIVRABLE » ne veut pas dire « juste ».** Le juge prouve qu'un outil "
+                "répond, refuse proprement ce qu'il doit refuser, et ne sort pas de son "
+                "périmètre. Il ne prouve pas que sa réponse est la bonne : c'est à vous de "
+                "lire la question qu'il déclare et de juger si elle est la vôtre.\n\n"
+                "⚠️ **Mesuré sur une machine, pas sur toutes.** "
+                f"{bloquées} distributions sur {total} sont bloquées par une politique système "
+                f"sur la machine de référence ({pourcentage} %) ; les outils qui les emploient "
+                "fonctionnent en mode dégradé et le disent."
+            )
+        else:
+            limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. {bloquées} distributions sur {total} sont bloquées ({pourcentage} %)."
+
+        if total_reports > 1:
+            mismatches = sum(1 for c in livrable_counts.values() if 0 < c < total_reports)
+            if mismatches > 0:
+                limites += f" {mismatches} outil{'s' if mismatches!=1 else ''} passent sur une plateforme mais pas sur l’autre."
     except FileNotFoundError:
-        limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. non mesuré."
+        if non_livrables == 0:
+            limites = (
+                "⚠️ **« LIVRABLE » ne veut pas dire « juste ».** Le juge prouve qu'un outil "
+                "répond, refuse proprement ce qu'il doit refuser, et ne sort pas de son "
+                "périmètre. Il ne prouve pas que sa réponse est la bonne : c'est à vous de "
+                "lire la question qu'il déclare et de juger si elle est la vôtre.\n\n"
+                "⚠️ **Mesuré sur une machine, pas sur toutes.** non mesuré."
+            )
+        else:
+            limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. non mesuré."
     except Exception as e:
         print(f"Erreur lors de la lecture de {epreuve_path} : {e}", file=sys.stderr)
-        limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. non mesuré."
-
-    if total_reports > 1:
-        mismatches = sum(1 for c in livrable_counts.values() if 0 < c < total_reports)
-        limites += f" {mismatches} outil{'s' if mismatches!=1 else ''} passent sur une plateforme mais pas sur l’autre."
+        if non_livrables == 0:
+            limites = (
+                "⚠️ **« LIVRABLE » ne veut pas dire « juste ».** Le juge prouve qu'un outil "
+                "répond, refuse proprement ce qu'il doit refuser, et ne sort pas de son "
+                "périmètre. Il ne prouve pas que sa réponse est la bonne : c'est à vous de "
+                "lire la question qu'il déclare et de juger si elle est la vôtre.\n\n"
+                "⚠️ **Mesuré sur une machine, pas sur toutes.** non mesuré."
+            )
+        else:
+            limites = f"⚠️ {non_livrables} outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. non mesuré."
 
     # Comment cette page a été produite
     script_name = Path(__file__).name
@@ -1107,9 +1264,9 @@ def engendrer(
         banniere_url=banniere_url,
         description=description,
         tableau_etat=tableau_etat,
-        par_ou_commencer=par_ou_commencer,
-        installation=installation,
-        demarrage=demarrage,
+        par_ou_commencer="",
+        installation="",
+        demarrage="",
         outils_section=outils_section,
         mesures=mesures,
         limites=limites,
@@ -1117,7 +1274,12 @@ def engendrer(
         depot_url=depot_url,
         branche=branche,
         titre=titre or racine.name,
+        total_outils=total_outils,
+        nom_projet=nom_projet,
+        exemples=exemples,
         annee=annee_courante,
+        auteur=auteur,
+        copyright_text=copyright_text,
     )
     (cible / "README.md").write_text(readme, encoding="utf-8")
 
@@ -1142,20 +1304,31 @@ def engendrer(
         encoding="utf-8",
     )
 
-    # 10. Dockerfile
-    (cible / "Dockerfile").write_text(generer_dockerfile(image_digest), encoding="utf-8")
+    # 10. Dockerfile (BA8)
+    (cible / "Dockerfile").write_text(generer_dockerfile(image_digest, nom_projet), encoding="utf-8")
 
-    # 11. LICENSE
+    # .dockerignore (BA8)
+    (cible / ".dockerignore").write_text(
+        ".git\n"
+        ".github\n"
+        "__pycache__\n"
+        "*.pyc\n"
+        "docs\n",
+        encoding="utf-8",
+    )
+
+    # 11. LICENSE (BA5, BA6)
     try:
-        license_text = generer_license(annee_courante, titre or racine.name, chemin_licence)
+        license_text = generer_license(annee_courante, auteur or titre or racine.name, chemin_licence)
         (cible / "LICENSE").write_text(license_text, encoding="utf-8")
     except Exception as e:
         print(f"Erreur lors de la génération de LICENSE : {e}", file=sys.stderr)
-        (cible / "LICENSE").write_text(generer_license(annee_courante, titre or racine.name), encoding="utf-8")
+        (cible / "LICENSE").write_text(generer_license(annee_courante, auteur or titre or racine.name), encoding="utf-8")
 
-    # 12. workflow GitHub
+    # 12. workflow GitHub (BA7)
+    version_python = f"{sys.version_info.major}.{sys.version_info.minor}"
     (cible / ".github" / "workflows").mkdir(parents=True, exist_ok=True)
-    (cible / ".github" / "workflows" / "verifier.yml").write_text(generer_workflow(), encoding="utf-8")
+    (cible / ".github" / "workflows" / "verifier.yml").write_text(generer_workflow(version_python), encoding="utf-8")
 
     # 13. copie des outils
     for f in outils:
@@ -1167,7 +1340,8 @@ def engendrer(
 
     # 14. retour JSON
     examines = [f.stem for f in outils][:200]
-    return total_outils, examines
+    trous_restants = _verifier_trous(readme)[0]
+    return total_outils, examines, trous_restants, banner_type
 
 def main() -> int:
     _reconfig_stdout()
@@ -1227,6 +1401,25 @@ def main() -> int:
         default=argparse.SUPPRESS,
         help="Chemin vers le fichier de licence à utiliser (défaut : artefacts/AGPL-3.0.txt si valide).",
     )
+    commun.add_argument(
+        "--auteur",
+        type=str,
+        default=argparse.SUPPRESS,
+        help="Nom de l'auteur ou de la société pour le copyright (défaut : nom du projet).",
+    )
+    commun.add_argument(
+        "--copyright",
+        dest="copyright_text",
+        type=str,
+        default=argparse.SUPPRESS,
+        help="Texte complet de la ligne de copyright juridique (exact, sans aucun préfixe).",
+    )
+    commun.add_argument(
+        "--banniere",
+        type=Path,
+        default=argparse.SUPPRESS,
+        help="Chemin vers une bannière PNG fournie (remplace la génération automatique).",
+    )
 
     parser = argparse.ArgumentParser(
         prog="publier_vitrine.py",
@@ -1260,10 +1453,16 @@ def main() -> int:
     isolation_paths = getattr(args, "isolation", None)
     branche = getattr(args, "branche", "main")
     chemin_licence = getattr(args, "licence", None)
+    auteur = getattr(args, "auteur", None)
+    banniere_path = getattr(args, "banniere", None)
+    copyright_text = getattr(args, "copyright_text", None)
+
+    if not auteur:
+        print("Avertissement : --auteur non fourni, utilisation du nom du projet pour le copyright", file=sys.stderr)
 
     if args.commande == "engendrer":
         try:
-            total, examines = engendrer(
+            total, examines, trous_restants, banner_type = engendrer(
                 cible=args.cible,
                 racine=racine,
                 tout_copier=getattr(args, "tout_copier", False),
@@ -1274,6 +1473,9 @@ def main() -> int:
                 isolation_paths=isolation_paths,
                 branche=branche,
                 chemin_licence=chemin_licence,
+                auteur=auteur,
+                banniere=banniere_path,
+                copyright_text=copyright_text,
             )
         except FilesystemError as e:
             print(e, file=sys.stderr)
@@ -1284,13 +1486,19 @@ def main() -> int:
                 "denominateur": total,
                 "examines": examines,
                 "examines_tronques": len(examines) >= 200,
+                "trous_restants": trous_restants,
+                "banniere": banner_type,
             }
             if total == 0:
                 print("Denominateur nul : impossible de conclure.", file=sys.stderr)
                 return 3
             json.dump(out, sys.stdout, ensure_ascii=False, indent=2)
             sys.stdout.write("\n")
+            if trous_restants > 0:
+                return 2
             return 0
+        if trous_restants > 0:
+            return 2
         return 0
     return 1
 

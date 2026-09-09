@@ -57,3 +57,4 @@ cpuinfo, psutil, tiktoken — absentes, l'outil travaille en mode dégradé et l
 
 ---
 [← retour à la liste](../README.md)
+

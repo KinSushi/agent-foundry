@@ -48,3 +48,4 @@ dotenv, pydantic_settings — absentes, l'outil travaille en mode dégradé et l
 
 ---
 [← retour à la liste](../README.md)
+

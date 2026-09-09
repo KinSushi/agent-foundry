@@ -53,3 +53,4 @@ fastuuid, pybase64 — absentes, l'outil travaille en mode dégradé et le dit s
 
 ---
 [← retour à la liste](../README.md)
+

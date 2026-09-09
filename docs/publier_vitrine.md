@@ -17,7 +17,8 @@ usage: publier_vitrine.py [-h] [--racine RACINE] [--json]
                           [--image-digest IMAGE_DIGEST] [--titre TITRE]
                           [--sous-titre SOUS_TITRE] [--depot-url DEPOT_URL]
                           [--isolation ISOLATION] [--branche BRANCHE]
-                          [--licence LICENCE]
+                          [--licence LICENCE] [--auteur AUTEUR]
+                          [--copyright COPYRIGHT_TEXT] [--banniere BANNIERE]
                           {engendrer} ...
 
 Génère une vitrine complète à partir de mesures.
@@ -41,6 +42,10 @@ options:
                         Chemin vers un rapport d’isolation (peut être répété).
   --branche BRANCHE     Nom de la branche pour l'URL raw GitHub (défaut: main).
   --licence LICENCE     Chemin vers le fichier de licence à utiliser (défaut : artefacts/AGPL-3.0.txt si valide).
+  --auteur AUTEUR       Nom de l'auteur ou de la société pour le copyright (défaut : nom du projet).
+  --copyright COPYRIGHT_TEXT
+                        Texte complet de la ligne de copyright juridique (exact, sans aucun préfixe).
+  --banniere BANNIERE   Chemin vers une bannière PNG fournie (remplace la génération automatique).
 ```
 
 ## Ce qu'il rend
@@ -67,3 +72,4 @@ pymupdf — absentes, l'outil travaille en mode dégradé et le dit sur stderr
 
 ---
 [← retour à la liste](../README.md)
+

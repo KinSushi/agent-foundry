@@ -1,50 +1,59 @@
-[![Banner](https://raw.githubusercontent.com/KinSushi/agent-foundry/main/images/banner.png)](https://raw.githubusercontent.com/KinSushi/agent-foundry/main/images/banner.png)
-*La bannière s'affiche correctement une fois le dépôt poussé ; GitHub sert alors le PNG depuis `raw.githubusercontent.com`.*
+![banniere](https://raw.githubusercontent.com/KinSushi/agent-foundry/main/images/banner.png)
 
-Increase what AI can produce
+![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue) ![Python](https://img.shields.io/badge/python-3.14-blue) ![Outils](https://img.shields.io/badge/outils-104-brightgreen) ![Prouvés](https://img.shields.io/badge/prouvés%20en%20isolation-104%2F104-brightgreen) ![Plateformes](https://img.shields.io/badge/plateformes-2-brightgreen)
+
+# Agent Foundry
+
+> Increase what AI can produce
+
+104 outils en ligne de commande pour les agents IA. Chacun donne à l'agent une capacité qu'il n'a pas, ou rend meilleur ce qu'il fait mal : refuser de conclure sur rien, détecter une API inventée, dire ce qu'il a réellement examiné.
+
+Bibliothèque standard seule. Aucune dépendance obligatoire. Et rien n'est publié sur parole : **les 104 outils sont prouvés en isolation totale, sur deux plateformes**, par un juge qui se prouve d'abord lui-même.
 
 | Mesure | Valeur | Commande qui la reproduit |
 |--------|--------|--------------------------|
 | Outils livrés | 104 | `ls outils/*.py \| wc -l` |
 | Conformes au socle | 104/104 | `python mesures/porte_qualite.py outils/*.py` |
 | Livrables en isolation | 104/104 | `python mesures/test_isolation.py outils` |
-| Éprouvés sur | 2 plateformes | voir « Comment c’est mesuré » |
 
-Sélectionnés parmi 104 outils du dépôt d'origine ; 0 n'ont pas franchi la porte.
+**Les 104 outils du dépôt d'origine ont franchi la porte.** Aucun n'a été écarté.
 
-## Par où commencer
-```
-git clone https://github.com/KinSushi/agent-foundry && cd puissance-60-bibliotheques-python
+## Démarrage
+
+Aucune installation. Python 3.14, et c'est tout.
+
+```bash
+git clone https://github.com/KinSushi/agent-foundry && cd agent-foundry
 python outils/afficher_progression.py --help
 ```
 
-## Installation
-Aucune installation n'est nécessaire : les outils sont en bibliothèque standard et s'exécutent tels quels sous Python 3.14.
+Chaque outil documente ses arguments par `--help`, rend du JSON avec `--json`, et publie `denominateur` — le nombre d'éléments qu'il a réellement examinés. Un outil qui n'a rien à examiner refuse de conclure et le dit.
 
-Chaque outil s'appelle `python outils/NOM.py --help`, où `NOM` est le nom de l'outil dans la liste ci-dessous.
+Trois pour commencer :
 
-Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque. Pour les installer toutes :
+| Outil | Ce qu'il répond |
+|---|---|
+| [afficher_progression](docs/afficher_progression.md) | Où en est ce traitement long ? |
+| [afficher_riche](docs/afficher_riche.md) | Comment présenter ce résultat de manière lisible ? |
+| [analyser_portees](docs/analyser_portees.md) | À quelle portée appartient chaque nom, et quelles fermetures capturent variable qui évolue ? |
 
-    pip install .[tout]
+Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque : `pip install .[tout]`.
 
 ### Reproduire l'audit complet
 
-    docker build -t puissance-60-bibliotheques-python .
+La construction rejoue la porte de qualité et le juge d'isolation **à l'intérieur de l'image**. Si un seul outil échoue, l'image n'existe pas.
 
-## Démarrage
-**Où en est ce traitement long ?**
+```bash
+docker build -t agent-foundry .
+```
 
-    python outils/afficher_progression.py --help
-**Comment présenter ce résultat de manière lisible ?**
+## Les outils
 
-    python outils/afficher_riche.py --help
-**À quelle portée appartient chaque nom, et quelles fermetures capturent variable qui évolue ?**
+104 outils, chacun avec sa page : ce qu'il répond, comment on s'en sert, toutes ses options, et ce qu'il ne fait pas.
 
-    python outils/analyser_portees.py --help
+<details>
+<summary>Voir les 104 outils</summary>
 
-- Chaque outil accepte `--json` pour produire du JSON.
-
-## Les outils livrés
 | Outil | Ce qu’il répond | Éprouvé sur |
 |-------|-----------------|------------|
 | [afficher_progression](docs/afficher_progression.md) | Où en est ce traitement long ? | 2 / 2 |
@@ -152,32 +161,40 @@ Certains outils font davantage si une bibliothèque tierce est présente, et le 
 | [verrouiller_ressource](docs/verrouiller_ressource.md) | Vérifie si une ressource (fichier) est déjà utilisée par un autre processus. | 2 / 2 |
 | [voir_image](docs/voir_image.md) | Que montre cette image, et où sont les objets/contours ? | 2 / 2 |
 
-## Ce qui n'a pas été retenu
-0 outils n'ont pas été sélectionnés car ils ne sont pas livrés dans cette vitrine.
-| Outil | Ce qu’il répond | Verdict | Éprouvé sur |
-|-------|-----------------|--------|------------|
+</details>
 
-
-## Comment c’est mesuré
+## Comment c'est mesuré
 - `docker build .` : rejoue la porte et le juge À L'INTÉRIEUR d'une image épinglée par empreinte. Si un seul outil échoue, l'image n'existe pas.
 - `mesures/porte_qualite.py` : 15 contrôles de forme sur chaque outil.
 - `mesures/test_isolation.py` : chaque outil est copié seul dans un dossier temporaire, appelé de seize façons, avec détection de fuite en lecture, écriture et réseau.
 Un **VERDICT** peut être : LIVRABLE, FORWARD KO, REVERSE KO, FUITE.
 
-*Verdicts issus de 2 rapports : isolation_102.json, isolation_linux.json*
+*Verdicts établis sur 2 plateformes : Windows 11 et Linux (conteneur)*
 
 ## Ce que cette boîte NE fait PAS
-⚠️ 0 outils ne sont pas livrables. Le statut « LIVRABLE » ne garantit pas l’absence de défauts. 34 distributions sur 188 sont bloquées (18.1 %). 0 outils passent sur une plateforme mais pas sur l’autre.
+⚠️ **« LIVRABLE » ne veut pas dire « juste ».** Le juge prouve qu'un outil répond, refuse proprement ce qu'il doit refuser, et ne sort pas de son périmètre. Il ne prouve pas que sa réponse est la bonne : c'est à vous de lire la question qu'il déclare et de juger si elle est la vôtre.
+
+⚠️ **Mesuré sur une machine, pas sur toutes.** 34 distributions sur 188 sont bloquées par une politique système sur la machine de référence (18.1 %) ; les outils qui les emploient fonctionnent en mode dégradé et le disent.
+
+## Comment cette page a été produite
+
+Ce README, la bannière, le `pyproject.toml` et le `Dockerfile` sont
+engendrés depuis les mesures. Aucun chiffre n'y est saisi à la main :
+
+```
+python publier_vitrine.py engendrer <cible> --racine .
+```
+
+Relancer la commande après une nouvelle mesure met la page à jour.
+Un chiffre absent s'écrit « non mesuré », jamais une valeur plausible.
 
 ## Licence
-
-Copyright (C) 2026 Agent Foundry
-
-Ce programme est un logiciel libre : vous pouvez le redistribuer et le
-modifier selon les termes de la GNU Affero General Public License telle
-que publiée par la Free Software Foundation, en version 3 ou toute
-version ultérieure.
 
 [AGPL-3.0-or-later](LICENSE). En clair : vous pouvez utiliser, modifier 
 et redistribuer ce code, y compris en le faisant tourner comme service 
 réseau — à condition de publier vos modifications sous la même licence.
+
+Copyright (C) 2026 SOVRALYS LLC — Enzo C. Di Bacco (KinSushi). All rights reserved.
+
+---
+Auteur — KinSushi · Enzo · Sovralys LLC
