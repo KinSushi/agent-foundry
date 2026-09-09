@@ -1,6 +1,6 @@
 # croiser_motifs
 
-> OMISE
+> ces motifs se recouvrent-ils, et lequel ne servira jamais ?
 
 ## Comment s'en servir
 
@@ -44,11 +44,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-motifs ; le témoin est UNE chaîne, pas toutes
+backreference et  REFUSÉS ; coût QUADRATIQUE en nombre de motifs ; le témoin est UNE chaîne, pas toutes
 
 ## Contre‑exemples
 
-l'est pas — d'où INDÉCIDABLE, et un code de sortie distinct
+un motif refusé rendu « disjoint » déclarerait sûr ce qui l'est pas — d'où INDÉCIDABLE, et un code de sortie distinct
 
 ## Ce qu'il lui faut
 

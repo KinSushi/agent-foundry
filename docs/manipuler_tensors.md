@@ -1,6 +1,6 @@
 # manipuler_tensors
 
-> OMISE
+> Comment transformer ce tenseur ?
 
 ## Comment s'en servir
 
@@ -48,7 +48,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Sans les paquets optionnels numpy et/ou einops, l'outil ne peut effectuer que la transformation identité.
+
+## Contre‑exemples
+
+Un fichier d'entrée vide ou ne contenant aucun élément entraîne un refus de conclusion.
 
 ## Ce qu'il lui faut
 

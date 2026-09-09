@@ -1,6 +1,6 @@
 # verifier_signature_jwt
 
-> OMISE
+> Ce token JWT est‑il valide ?
 
 ## Comment s'en servir
 
@@ -44,11 +44,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-claims (nbf, iat, aud, iss, …) ni les signatures RSA/ECDSA.
+Ne vérifie que les algorithmes HMAC (HS256). Ne valide pas les autres claims (nbf, iat, aud, iss, …) ni les signatures RSA/ECDSA.
 
 ## Contre‑exemples
 
-est correcte car l’outil ne supporte que HS256.
+Un token signé avec HS384 sera considéré invalide même si la signature est correcte car l’outil ne supporte que HS256.
 
 ## Ce qu'il lui faut
 

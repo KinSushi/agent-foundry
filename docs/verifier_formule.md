@@ -1,6 +1,6 @@
 # verifier_formule
 
-> OMISE
+> ces deux expressions calculent-elles la meme chose ?
 
 ## Comment s'en servir
 
@@ -50,11 +50,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-concordance mpmath sur 50 chiffres reste un FAISCEAU, jamais une preuve ; ne traite ni boucle, ni effet de bord, ni structure de donnees
+le theoreme de Richardson garantit l'INDECIDABLE ; une concordance mpmath sur 50 chiffres reste un FAISCEAU, jamais une preuve ; ne traite ni boucle, ni effet de bord, ni structure de donnees
 
 ## Contre‑exemples
 
-d'ou le verdict DOMAINES DIVERGENTS, distinct des trois autres
+x/x et 1 rendent ÉQUIVALENT alors que c'est faux en x=0 -- d'ou le verdict DOMAINES DIVERGENTS, distinct des trois autres
 
 ## Ce qu'il lui faut
 

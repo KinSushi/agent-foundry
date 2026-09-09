@@ -1,6 +1,6 @@
 # encoder_decoder
 
-> OMISE
+> Comment convertir ces données entre formats binaires/textuels ?
 
 ## Comment s'en servir
 
@@ -45,7 +45,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+UUID v7 natif en Python 3.14 est lent, pas de UUID v8 natif
+
+## Contre‑exemples
+
+UUID v7 généré avec random() peut avoir des collisions
 
 ## Ce qu'il lui faut
 

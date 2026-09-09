@@ -1,6 +1,6 @@
 # carte_appels
 
-> OMISE
+> qui appelle quoi dans ce depot, sans rien executer ?
 
 ## Comment s'en servir
 
@@ -44,7 +44,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+ne voit NI getattr(objet, nom)(), NI les appels par dispatch dynamique, NI ce qu'un decorateur insere ; ne resout pas la surcharge : deux methodes de meme nom sont confondues
+
+## Contre‑exemples
+
+une classe a __getattr__ expose des appels qu'aucun AST ne peut enumerer -- l'outil doit les COMPTER comme indecidables, pas les taire
 
 ## Ce qu'il lui faut
 

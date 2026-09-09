@@ -1,6 +1,6 @@
 # pont_outils
 
-> OMISE
+> cet outil est-il utilisable par un autre projet ?
 
 ## Comment s'en servir
 
@@ -46,11 +46,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-l'API soit stable entre deux versions
+ne voit pas les imports dynamiques ; ne garantit pas que l'API soit stable entre deux versions
 
 ## Contre‑exemples
 
-importable alors qu'il l'est — mesuré
+un critère unique « contient print » déclare Banc non importable alors qu'il l'est — mesuré
 
 ## Ce qu'il lui faut
 

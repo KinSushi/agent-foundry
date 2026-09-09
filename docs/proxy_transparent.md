@@ -1,6 +1,6 @@
 # proxy_transparent
 
-> OMISE
+> Puis-je intercepter/modifier des requêtes HTTP ?
 
 ## Comment s'en servir
 
@@ -39,7 +39,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Un proxy transparent au niveau réseau pur sans modification du code source n'est pas réalisable en Python pur sans droits administrateur et configuration système. L'analyse est statique.
+
+## Contre‑exemples
+
+Un simple appel httpx.get() sans event_hooks ni transport personnalisé n'intercepte ni ne modifie les requêtes.
 
 ## Ce qu'il lui faut
 

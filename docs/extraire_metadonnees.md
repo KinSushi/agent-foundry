@@ -1,14 +1,14 @@
 # extraire_metadonnees
 
-> OMISE
+> Quelles métadonnées ce fichier contient‑il ?
 
 ## Comment s'en servir
 
 ```
-extraire_metadonnees.py --json mon_fichier.pdf
+python outils/extraire_metadonnees.py exemple.py --json
 ```
 
-Sous-commande `fichier` : Chemin vers le fichier à analyser.
+Invocation déclarée par l'outil lui-même, et rejouée par le juge à chaque mesure.
 
 ## Toutes les options
 
@@ -41,7 +41,7 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-propriétaires non documentés. CONTRE‑EXEMPLES: PDF sans XMP, image sans EXIF.
+Ne traite pas les métadonnées audio/vidéo ni les formats propriétaires non documentés. CONTRE‑EXEMPLES: PDF sans XMP, image sans EXIF.
 
 ## Ce qu'il lui faut
 

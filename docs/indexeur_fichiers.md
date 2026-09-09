@@ -1,6 +1,6 @@
 # indexeur_fichiers
 
-> OMISE
+> Où sont stockés ces motifs dans des fichiers binaires ?
 
 ## Comment s'en servir
 
@@ -37,11 +37,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-interne n'est effectuée. L'outil fonctionne en mode dégradé si les bibliothèques tierces sont absentes.
+Seules les signatures prédéfinies sont détectées ; aucune analyse de structure interne n'est effectuée. L'outil fonctionne en mode dégradé si les bibliothèques tierces sont absentes.
 
 ## Contre‑exemples
 
-d'un flux compressé sera néanmoins signalé comme une occurrence.
+Un fichier PDF dont la signature %PDF- apparaît uniquement à l'intérieur d'un flux compressé sera néanmoins signalé comme une occurrence.
 
 ## Ce qu'il lui faut
 

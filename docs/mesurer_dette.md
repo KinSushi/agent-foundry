@@ -1,6 +1,6 @@
 # mesurer_dette
 
-> OMISE
+> ce changement ajoute-t-il de la dette, et où ?
 
 ## Comment s'en servir
 
@@ -42,11 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-peut être fausse, une fonction à 30 branches peut être un automate légitime ; la formule de maintenabilité n'est pas normalisée ; ast.walk additionne les fonctions imbriquées
+la complexité ne mesure PAS la qualité — une fonction simple peut être fausse, une fonction à 30 branches peut être un automate légitime ; la formule de maintenabilité n'est pas normalisée ; ast.walk additionne les fonctions imbriquées
 
 ## Contre‑exemples
 
-un score faible signale, il ne condamne pas
+`verifier.py` de ce projet sort à 13,7/100 et il fonctionne : un score faible signale, il ne condamne pas
 
 ## Ce qu'il lui faut
 

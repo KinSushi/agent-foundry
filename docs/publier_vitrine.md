@@ -16,9 +16,10 @@ Invocation déclarée par l'outil lui-même, et rejouée par le juge à chaque m
 usage: publier_vitrine.py [-h] [--racine RACINE] [--json]
                           [--image-digest IMAGE_DIGEST] [--titre TITRE]
                           [--sous-titre SOUS_TITRE] [--depot-url DEPOT_URL]
-                          [--isolation ISOLATION] [--branche BRANCHE]
-                          [--licence LICENCE] [--auteur AUTEUR]
-                          [--copyright COPYRIGHT_TEXT] [--banniere BANNIERE]
+                          [--isolation ISOLATION] [--porte PORTE]
+                          [--branche BRANCHE] [--licence LICENCE]
+                          [--auteur AUTEUR] [--copyright COPYRIGHT_TEXT]
+                          [--banniere BANNIERE]
                           {engendrer} ...
 
 Génère une vitrine complète à partir de mesures.
@@ -40,6 +41,7 @@ options:
                         URL du dépôt à placer dans [project.urls]; si absent, la section est omise.
   --isolation ISOLATION
                         Chemin vers un rapport d’isolation (peut être répété).
+  --porte PORTE         Chemin vers le rapport de la porte de qualité (défaut : artefacts/porte_102.json).
   --branche BRANCHE     Nom de la branche pour l'URL raw GitHub (défaut: main).
   --licence LICENCE     Chemin vers le fichier de licence à utiliser (défaut : artefacts/AGPL-3.0.txt si valide).
   --auteur AUTEUR       Nom de l'auteur ou de la société pour le copyright (défaut : nom du projet).

@@ -1,6 +1,6 @@
 # chiffrer_payload
 
-> OMISE
+> Puis-je chiffrer ce payload pour le transporter ?
 
 ## Comment s'en servir
 
@@ -45,11 +45,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Le mode dégradé n'est pas un chiffrement standard audité. La sécurité repose sur le mot de passe.
 
 ## Contre‑exemples
 
-Mot de passe vide : refuse.
+Payload vide : dénominateur nul, l'outil refuse de conclure. Mot de passe vide : refuse.
 
 ## Ce qu'il lui faut
 

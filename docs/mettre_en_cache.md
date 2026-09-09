@@ -1,6 +1,6 @@
 # mettre_en_cache
 
-> OMISE
+> Comment éviter de recalculer ce résultat coûteux ?
 
 ## Comment s'en servir
 
@@ -41,7 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne détecte pas les caches personnalisés non standard (ex: dictionnaire global). N'évalue pas le coût réel de la fonction.
+
+## Contre‑exemples
+
+Une fonction simple sans arguments ou avec effets de bord ne nécessite pas de cache, mais sera signalée.
 
 ## Ce qu'il lui faut
 

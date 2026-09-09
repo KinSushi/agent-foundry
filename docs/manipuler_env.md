@@ -1,6 +1,6 @@
 # manipuler_env
 
-> OMISE
+> Quelles variables d'environnement ce processus voit-il ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne distingue pas l origine (shell vs .env) apres chargement ; ne decrypte aucune valeur.
+
+## Contre‑exemples
+
+Une variable definie dans un .env mais ecrasee par le shell apparait avec la valeur du shell.
 
 ## Ce qu'il lui faut
 

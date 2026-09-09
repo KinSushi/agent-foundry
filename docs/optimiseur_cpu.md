@@ -1,6 +1,6 @@
 # optimiseur_cpu
 
-> OMISE
+> Quelles fonctions consomment le plus de CPU ?
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne mesure pas le temps d'execution reel, ignore les entrees/sorties bloquantes et les appels systeme. Les fonctions generees dynamiquement non presentes dans l'espace de noms du module sont ignorees.
+
+## Contre‑exemples
+
+Une fonction avec une seule instruction `time.sleep(10)` aura un cout statique faible mais un cout temps reel eleve. Une fonction recursive aura un cout statique sous-estime.
 
 ## Ce qu'il lui faut
 

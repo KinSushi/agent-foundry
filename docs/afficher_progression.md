@@ -1,6 +1,6 @@
 # afficher_progression
 
-> OMISE
+> Où en est ce traitement long ?
 
 ## Comment s'en servir
 
@@ -46,11 +46,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-être imprécis si le temps par élément varie fortement. Sans module tierce, seule une sortie textuelle basique est disponible.
+Ne mesure pas le temps CPU, seulement le temps écoulé. L'ETA peut être imprécis si le temps par élément varie fortement. Sans module tierce, seule une sortie textuelle basique est disponible.
 
 ## Contre‑exemples
 
-hétérogènes (ex : lecture de fichiers de tailles très différentes).
+Un itérable dont les éléments ont des temps de traitement très hétérogènes (ex : lecture de fichiers de tailles très différentes).
 
 ## Ce qu'il lui faut
 

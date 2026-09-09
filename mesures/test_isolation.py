@@ -315,6 +315,7 @@ def _extraire_section_docstring(
     """
     Extrait les lignes d'une section spécifique du docstring.
     La capture s'arrête à une ligne vide ou à un autre intitulé.
+    Reconnaît les deux formes d'intitulé (avec ou sans deux-points).
     """
     INTITULES = {'QUESTION', 'MESURE', 'HYPOTHESES', 'HYPOTHÈSES', 'LIMITES',
                  'CONTRE-EXEMPLES', 'CONTRE-EXEMPLE', 'INVOCATION', 'DOMAINE'}
@@ -322,8 +323,18 @@ def _extraire_section_docstring(
     capture = False
     for line in doc.splitlines():
         stripped = line.strip()
-        if stripped.upper() == titre.upper():
+        haut = stripped.upper()
+        if haut == titre.upper() or haut.startswith((titre.upper() + ':', titre.upper() + ' ',
+                                                     titre.upper() + '	')):
             capture = True
+            # Trois formes d'intitulé : seul sur sa ligne, « TITRE: cmd », « TITRE    cmd ».
+            # On ne coupe JAMAIS sur le premier deux-points du reste : une commande
+            # peut en porter un ({fichier}:ma_fonction, C:\chemin).
+            reste = stripped[len(titre):].lstrip(' 	')
+            if reste.startswith(':'):
+                reste = reste[1:].strip()
+            if reste:
+                lignes.append(reste)
             continue
         if capture:
             if not stripped:
@@ -333,6 +344,19 @@ def _extraire_section_docstring(
                 break
             lignes.append(stripped)
     return lignes
+
+def _recolle_lignes_continuation(lignes: List[str]) -> List[str]:
+    """Recolle les lignes se terminant par un antislash avec la suivante."""
+    result = []
+    i = 0
+    while i < len(lignes):
+        line = lignes[i]
+        while line.endswith('\\') and i + 1 < len(lignes):
+            line = line[:-1] + lignes[i+1]
+            i += 1
+        result.append(line)
+        i += 1
+    return result
 
 def _ligne_est_commande(ligne: str) -> bool:
     """Vérifie si une ligne ressemble à une commande valide."""
@@ -361,6 +385,7 @@ def _extraire_invocations_declarees(
 
     # Extraction des lignes après le titre INVOCATION
     invoc_lines = _extraire_section_docstring(doc, "INVOCATION")
+    invoc_lines = _recolle_lignes_continuation(invoc_lines)
     invoc_lines = [line for line in invoc_lines if _ligne_est_commande(line)]
 
     commands: List[List[str]] = []

@@ -1,6 +1,6 @@
 # planifier_taches
 
-> OMISE
+> Quand cette tâche doit‑elle s’exécuter ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,7 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-CONTRE‑EXEMPLES Un appel à apscheduler.add_job() avec un trigger non cron (date, interval).
+Ne traite pas les expressions cron dynamiques ou générées à l’exécution. CONTRE‑EXEMPLES Un appel à apscheduler.add_job() avec un trigger non cron (date, interval).
 
 ## Ce qu'il lui faut
 

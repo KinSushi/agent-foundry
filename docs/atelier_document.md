@@ -1,6 +1,6 @@
 # atelier_document
 
-> OMISE
+> que dit ce document, et où exactement le dit-il ?
 
 ## Comment s'en servir
 
@@ -43,11 +43,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-la détection de tables est limitée, la bibliothèque le dit elle‑même ; pymupdf porte un binaire, donc NON embarquable
+un PDF scanné rend 0 caractère — aucun OCR disponible ici ; la détection de tables est limitée, la bibliothèque le dit elle‑même ; pymupdf porte un binaire, donc NON embarquable
 
 ## Contre‑exemples
 
-cet outil corrige, mesurée à 37 citations fausses sur 39
+un extrait sans position ne se vérifie pas — c'est la faute que cet outil corrige, mesurée à 37 citations fausses sur 39
 
 ## Ce qu'il lui faut
 

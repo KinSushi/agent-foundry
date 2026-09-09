@@ -1,6 +1,6 @@
 # retenir_memoire
 
-> OMISE
+> pourquoi cet objet est-il encore en mémoire, et qui le retient ?
 
 ## Comment s'en servir
 
@@ -46,7 +46,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+ne voit pas les références détenues par du C ; ne voit pas ce qu'un autre thread retient au même instant ; tracemalloc fausse le chronométrage
+
+## Contre‑exemples
+
+l'instrument non corrigé retient sa cible et rend TOUJOURS « encore vivant » — mesuré
 
 ## Ce qu'il lui faut
 

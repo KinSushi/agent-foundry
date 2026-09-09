@@ -1,6 +1,6 @@
 # extraire_pdf
 
-> OMISE
+> Que contient ce PDF (texte, structure, images) ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Sans pymupdf, l extraction du texte est limitee aux chaines simples (Tj/TJ) et les images sont seulement decomptees.
+
+## Contre‑exemples
+
+Un PDF chiffre ou un fichier non PDF renvoie un resultat vide ou une erreur. Un PDF avec texte vectoriel complexe peut donner un texte vide en mode degrade.
 
 ## Ce qu'il lui faut
 

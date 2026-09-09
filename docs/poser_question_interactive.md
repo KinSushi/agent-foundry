@@ -1,6 +1,6 @@
 # poser_question_interactive
 
-> OMISE
+> Comment demander une décision humaine ?
 
 ## Comment s'en servir
 
@@ -39,7 +39,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Pas d'interface graphique, aucune validation avancée.
+
+## Contre‑exemples
+
+Entrées vides ou non‑texte.
 
 ## Ce qu'il lui faut
 

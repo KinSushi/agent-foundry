@@ -1,6 +1,6 @@
 # empreinte_api
 
-> OMISE
+> qu'est-ce qui a cassé entre ces deux versions ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-isfunction|isclass rate les formes spéciales et les fonctions C ; un __getattr__ dynamique n'est pas énumérable
+ne voit pas un changement de COMPORTEMENT à signature égale ; isfunction|isclass rate les formes spéciales et les fonctions C ; un __getattr__ dynamique n'est pas énumérable
 
 ## Contre‑exemples
 
-qu'aucune API n'ait changé — faux positif qui décrédibilise
+une empreinte calculée sur un ordre non trié diverge sans qu'aucune API n'ait changé — faux positif qui décrédibilise
 
 ## Ce qu'il lui faut
 

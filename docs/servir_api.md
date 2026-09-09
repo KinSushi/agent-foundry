@@ -1,6 +1,6 @@
 # servir_api
 
-> OMISE
+> Comment exposer ce résultat via HTTP ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-pas de HTTPS natif. Mode dégradé avec wsgiref si modules tiers absents.
+Pas de support ASGI natif, pas de streaming, pas de haute performance, pas de HTTPS natif. Mode dégradé avec wsgiref si modules tiers absents.
 
 ## Contre‑exemples
 
-faulthandler ou dedent=True dans Interpreter.exec est évitée.
+Utilisation de paramètres inexistants comme all_threads=True dans faulthandler ou dedent=True dans Interpreter.exec est évitée.
 
 ## Ce qu'il lui faut
 

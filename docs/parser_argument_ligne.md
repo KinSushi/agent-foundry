@@ -1,6 +1,6 @@
 # parser_argument_ligne
 
-> OMISE
+> Comment interpréter ces arguments CLI ?
 
 ## Comment s'en servir
 
@@ -39,7 +39,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne capture pas les arguments générés dynamiquement ou via des boucles complexes.
+
+## Contre‑exemples
+
+Un script qui construit ses arguments avec une boucle `for` ne sera pas analysé correctement.
 
 ## Ce qu'il lui faut
 

@@ -1,6 +1,6 @@
 # appeler_llm
 
-> OMISE
+> Que répond ce fournisseur de LLM ?
 
 ## Comment s'en servir
 
@@ -59,11 +59,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-retries manuels. Sans mistral-common, pas de comptage de tokens.
+Sans openai ni httpx, utilise urllib (pas de streaming). Sans backoff, retries manuels. Sans mistral-common, pas de comptage de tokens.
 
 ## Contre‑exemples
 
-lisible sur stderr. Une clé absente provoque un message clair.
+Un fournisseur non compatible OpenAI renvoie une erreur HTTP lisible sur stderr. Une clé absente provoque un message clair.
 
 ## Ce qu'il lui faut
 

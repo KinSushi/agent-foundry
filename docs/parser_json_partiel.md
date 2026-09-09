@@ -1,6 +1,6 @@
 # parser_json_partiel
 
-> OMISE
+> Que contient ce flux JSON incomplet ?
 
 ## Comment s'en servir
 
@@ -43,7 +43,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+La réparation naïve ne gère pas les chaînes multilignes ni les échappements complexes.
+
+## Contre‑exemples
+
+Un flux tronqué au milieu d'une clé de dictionnaire peut être mal réparé.
 
 ## Ce qu'il lui faut
 

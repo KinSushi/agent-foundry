@@ -1,6 +1,6 @@
 # manipuler_fuseaux
 
-> OMISE
+> Quelle heure est‑il à cet endroit ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-ni des sauts de seconde intercalaires.
+L’outil ne tient pas compte de l’éventuelle inexactitude de l’horloge système ni des sauts de seconde intercalaires.
 
 ## Contre‑exemples
 
-une erreur.
+Si le fuseau demandé n’existe pas dans la base IANA, l’outil retourne une erreur.
 
 ## Ce qu'il lui faut
 

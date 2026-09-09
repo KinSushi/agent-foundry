@@ -1,6 +1,6 @@
 # cache_distribue
 
-> OMISE
+> Puis-je partager un cache entre processus ?
 
 ## Comment s'en servir
 
@@ -38,7 +38,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+L analyse est statique et basee sur l AST, elle ne couvre pas les alias complexes ou le code dynamique.
+
+## Contre‑exemples
+
+Un fichier utilisant dbm seul (sans multiprocessing) n est pas un defaut.
 
 ## Ce qu'il lui faut
 

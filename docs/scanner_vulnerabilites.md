@@ -1,6 +1,6 @@
 # scanner_vulnerabilites
 
-> OMISE
+> Ce code contient-il des patterns dangereux ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-les dépendances tierces. Peut produire des faux positifs/négatifs.
+Ne détecte pas les vulnérabilités dynamiques (injections SQL, XSS, etc.). Ne vérifie pas les dépendances tierces. Peut produire des faux positifs/négatifs.
 
 ## Contre‑exemples
 
-dans un contexte spécifique. Les paramètres inexistants comme all_threads=True dans faulthandler.dump_traceback_later() sont détectés.
+Un appel à __import__('module') peut être marqué comme dangereux même s'il est sécurisé dans un contexte spécifique. Les paramètres inexistants comme all_threads=True dans faulthandler.dump_traceback_later() sont détectés.
 
 ## Ce qu'il lui faut
 

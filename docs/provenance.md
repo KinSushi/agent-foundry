@@ -1,6 +1,6 @@
 # provenance
 
-> OMISE
+> de quoi ce résultat dépend-il ?
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+ne voit pas les imports dynamiques, ni les dépendances système hors Python (DLL de l'OS), ni les modules compilés dans l'interpréteur (origin = None, 71 modules)
+
+## Contre‑exemples
+
+numpy/random/_generator.pyd charge isolément mais son module n'importe pas — la chaîne de dépendances diffère du fichier
 
 ## Ce qu'il lui faut
 

@@ -1,6 +1,6 @@
 # ecouter_evenements
 
-> OMISE
+> Quels événements ce flux émet‑il en continu ?
 
 ## Comment s'en servir
 
@@ -44,7 +44,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-Ne gère pas les flux chiffrés sans bibliothèques tierces.
+Ne détecte pas les événements émis avant la connexion. Ne gère pas les flux chiffrés sans bibliothèques tierces.
+
+## Contre‑exemples
+
+Un flux qui n’émet que des keep‑alive sans données utiles.
 
 ## Ce qu'il lui faut
 

@@ -1,6 +1,6 @@
 # parser_markdown
 
-> OMISE
+> Quelle est la structure de ce document Markdown ?
 
 ## Comment s'en servir
 
@@ -41,7 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-Ne valide pas la syntaxe Markdown, seulement extrait les éléments visibles.
+Ne gère pas les extensions CommonMark avancées (tableaux, footnotes, etc.). Ne valide pas la syntaxe Markdown, seulement extrait les éléments visibles.
+
+## Contre‑exemples
+
+Un lien avec un titre contenant des crochets imbriqués peut être mal parsé.
 
 ## Ce qu'il lui faut
 

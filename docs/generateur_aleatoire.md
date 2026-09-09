@@ -1,6 +1,6 @@
 # generateur_aleatoire
 
-> OMISE
+> Puis-je générer des nombres aléatoires sans `random` ?
 
 ## Comment s'en servir
 
@@ -39,7 +39,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Les nombres générés ne sont pas cryptographiquement sûrs. Python pur ne peut pas fournir de tels nombres sans `secrets` ou `os.urandom`.
+
+## Contre‑exemples
+
+Si la graine est constante et connue, la séquence est prédictible.
 
 ## Ce qu'il lui faut
 

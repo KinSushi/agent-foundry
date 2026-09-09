@@ -1,6 +1,6 @@
 # valider_donnees
 
-> OMISE
+> Cette donnée est-elle conforme au schéma attendu ?
 
 ## Comment s'en servir
 
@@ -48,7 +48,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-Ne gère pas les références circulaires dans les données.
+Sans pydantic, la validation est moins expressive et les messages d'erreur moins riches. Ne gère pas les références circulaires dans les données.
+
+## Contre‑exemples
+
+Un schéma pydantic avec des validateurs personnalisés non déclarés dans les annotations.
 
 ## Ce qu'il lui faut
 

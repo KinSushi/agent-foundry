@@ -1,6 +1,6 @@
 # reecrire_sur
 
-> OMISE
+> puis-je modifier ce code sans rien perdre d'autre ?
 
 ## Comment s'en servir
 
@@ -43,11 +43,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-d'autres fichiers) ; untokenize sur 2-uplets ne restitue pas les espaces ; ne traite pas les f-strings imbriquées comme un seul jeton en 3.12+
+ne fait pas de renommage sémantique global (portées d'autres fichiers) ; untokenize sur 2-uplets ne restitue pas les espaces ; ne traite pas les f-strings imbriquées comme un seul jeton en 3.12+
 
 ## Contre‑exemples
 
-« équivalent » n'est pas « identique », et la différence s'appelle `# noqa`
+ast.unparse rend un code ÉQUIVALENT et pourtant appauvri — « équivalent » n'est pas « identique », et la différence s'appelle `# noqa`
 
 ## Ce qu'il lui faut
 

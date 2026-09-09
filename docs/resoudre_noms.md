@@ -1,6 +1,6 @@
 # resoudre_noms
 
-> OMISE
+> Quelle est l'adresse réelle de ce nom, et par quel chemin DNS ?
 
 ## Comment s'en servir
 
@@ -42,11 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-interrogé. Sans dnspython, le chemin DNS exact (serveurs interrogés) ne peut être connu.
+Aucun enregistrement MX, TXT, DNSSEC ou autre type que A/AAAA n'est interrogé. Sans dnspython, le chemin DNS exact (serveurs interrogés) ne peut être connu.
 
 ## Contre‑exemples
 
-sera considéré comme non résolu alors qu'il est valide pour la messagerie.
+Un nom qui ne possède que des enregistrements MX (pas d'A/AAAA) sera considéré comme non résolu alors qu'il est valide pour la messagerie.
 
 ## Ce qu'il lui faut
 

@@ -1,6 +1,6 @@
 # validateur_hash
 
-> OMISE
+> Ce fichier correspond-il à ce hash ?
 
 ## Comment s'en servir
 
@@ -45,7 +45,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne supporte que les algorithmes fournis par hashlib ; aucun hash moderne non présent n'est calculé.
+
+## Contre‑exemples
+
+Un fichier illisible ou un algorithme absent entraîne un refus de conclure.
 
 ## Ce qu'il lui faut
 

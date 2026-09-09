@@ -145,15 +145,20 @@ INTITULES = {
 
 def extraire_section(doc: str, intitule: str) -> str | None:
     """Renvoie le texte de la section *intitule* ou None si absente."""
-    pattern = re.compile(rf"(?m)^{intitule}\b.*?$", re.MULTILINE)
+    # Trois formes d'intitulé : seul sur sa ligne, « TITRE : texte », « TITRE    texte ».
+    # Le texte porté par la ligne de l'intitulé fait partie de la section : sans lui,
+    # 86 fiches sur 142 affichaient « OMISE » (mesuré le 8 septembre 2026).
+    pattern = re.compile(rf"(?m)^[ \t]*{intitule}S?\b[ \t]*:?[ \t]*(.*)$", re.MULTILINE)
     matches = list(pattern.finditer(doc))
     if not matches:
         return None
+    meme_ligne = matches[0].group(1).strip()
     start = matches[0].end()
-    next_pat = re.compile(r"(?m)^(?:" + "|".join(INTITULES) + r")\b")
+    next_pat = re.compile(r"(?m)^[ \t]*(?:" + "|".join(INTITULES) + r")S?\b")
     next_match = next_pat.search(doc, pos=start)
     end = next_match.start() if next_match else len(doc)
-    contenu = doc[start:end].strip()
+    suite = doc[start:end].strip()
+    contenu = (meme_ligne + ("\n" + suite if suite else "")).strip()
     return contenu if contenu else None
 
 def extraire_question(fichier: Path) -> str:
@@ -950,6 +955,7 @@ def engendrer(
     isolation_paths: List[Path] | None = None,
     branche: str = "main",
     chemin_licence: Path | None = None,
+    porte_path: Path | None = None,
     auteur: str | None = None,
     banniere: Path | None = None,
     copyright_text: str | None = None,
@@ -963,7 +969,7 @@ def engendrer(
         raise FilesystemError(f"La cible « {cible} » existe déjà et n’est pas un répertoire.")
 
     # 1. mesures diverses
-    porte, ok_porte = charger_json(racine / "artefacts" / "porte_102.json")
+    porte, ok_porte = charger_json(porte_path or (racine / "artefacts" / "porte_102.json"))
     redond, ok_red = charger_json(racine / "mesures" / "redondance.json")
     augm, ok_aug = charger_json(racine / "mesures" / "augmente_ameliore.json")
 
@@ -1345,7 +1351,22 @@ def engendrer(
         ".github\n"
         "__pycache__\n"
         "*.pyc\n"
+        "*.egg-info\n"
+        "build\n"
         "docs\n",
+        encoding="utf-8",
+    )
+
+    # .gitignore (BA9)
+    (cible / ".gitignore").write_text(
+        "__pycache__/\n"
+        "*.pyc\n"
+        "*.pyo\n"
+        "*.egg-info/\n"
+        "build/\n"
+        "dist/\n"
+        ".venv/\n"
+        "*.db\n",
         encoding="utf-8",
     )
 
@@ -1422,6 +1443,12 @@ def main() -> int:
         help="Chemin vers un rapport d’isolation (peut être répété).",
     )
     commun.add_argument(
+        "--porte",
+        type=Path,
+        default=None,
+        help="Chemin vers le rapport de la porte de qualité (défaut : artefacts/porte_102.json).",
+    )
+    commun.add_argument(
         "--branche",
         type=str,
         default="main",
@@ -1483,6 +1510,7 @@ def main() -> int:
     sous_titre = getattr(args, "sous_titre", "")
     depot_url = getattr(args, "depot_url", None)
     isolation_paths = getattr(args, "isolation", None)
+    porte_path = getattr(args, "porte", None)
     branche = getattr(args, "branche", "main")
     chemin_licence = getattr(args, "licence", None)
     auteur = getattr(args, "auteur", None)
@@ -1503,6 +1531,7 @@ def main() -> int:
                 sous_titre=sous_titre,
                 depot_url=depot_url,
                 isolation_paths=isolation_paths,
+                porte_path=porte_path,
                 branche=branche,
                 chemin_licence=chemin_licence,
                 auteur=auteur,

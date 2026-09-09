@@ -1,6 +1,6 @@
 # impact_tests
 
-> OMISE
+> quels tests dois-je relancer après ce changement ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-échoue à l'import ne cartographie rien ; « aucun test » ne veut pas dire « code mort » ; carte périmée dès que le code change
+une fonction appelée par réflexion n'apparaît pas ; un test qui échoue à l'import ne cartographie rien ; « aucun test » ne veut pas dire « code mort » ; carte périmée dès que le code change
 
 ## Contre‑exemples
 
-régressions de 6,08 % à 9,94 % — la discipline seule NUIT
+TDAD mesure que des instructions TDD SANS carte portent les régressions de 6,08 % à 9,94 % — la discipline seule NUIT
 
 ## Ce qu'il lui faut
 

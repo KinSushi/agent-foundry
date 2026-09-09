@@ -1,6 +1,6 @@
 # simulateur_latence
 
-> OMISE
+> Comment un code réagit-il à une latence réseau ?
 
 ## Comment s'en servir
 
@@ -52,7 +52,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne mesure pas les latences réelles, seulement des délais fixes.
+
+## Contre‑exemples
+
+Un code asynchrone ou multithreadé peut réagir différemment.
 
 ## Ce qu'il lui faut
 

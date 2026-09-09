@@ -1,6 +1,6 @@
 # stocker_nuage
 
-> OMISE
+> Comment lire/écrire/lister des objets dans un stockage cloud ?
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne gère pas les transferts multipart sans boto3.
+
+## Contre‑exemples
+
+Un objet trop grand pour la mémoire.
 
 ## Ce qu'il lui faut
 

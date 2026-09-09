@@ -1,6 +1,6 @@
 # verrouiller_ressource
 
-> OMISE
+> Vérifie si une ressource (fichier) est déjà utilisée par un autre processus.
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne détecte que les verrous sur le premier octet ; ne fonctionne pas sur systèmes de fichiers sans verrouillage consultatif.
+
+## Contre‑exemples
+
+Cas où le processus ouvre le fichier en lecture seule sans verrouillage ou utilise un verrou partiel.
 
 ## Ce qu'il lui faut
 

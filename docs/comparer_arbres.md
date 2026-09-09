@@ -1,6 +1,6 @@
 # comparer_arbres
 
-> OMISE
+> qu'est-ce qui a changé entre ces deux arbres ?
 
 ## Comment s'en servir
 
@@ -48,11 +48,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-supprimé + ajouté) ; ne compare pas les permissions ni les liens symboliques ; le hachage coûte une lecture complète
+ne suit pas les renommages (un fichier renommé paraît supprimé + ajouté) ; ne compare pas les permissions ni les liens symboliques ; le hachage coûte une lecture complète
 
 ## Contre‑exemples
 
-mtime au contenu DIFFÉRENT — mesuré, c'est la raison de l'outil
+dircmp rend « identiques » deux fichiers de même taille et même mtime au contenu DIFFÉRENT — mesuré, c'est la raison de l'outil
 
 ## Ce qu'il lui faut
 

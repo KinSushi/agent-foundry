@@ -1,6 +1,6 @@
 # indexer_arbre
 
-> OMISE
+> où est ce symbole, et cette citation existe-t-elle vraiment ?
 
 ## Comment s'en servir
 
@@ -36,7 +36,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+un index PÉRIMÉ répond faux sans le dire -- d'où l'empreinte ; FTS5 tokenise, donc une recherche de ponctuation échoue ; os.walk ne suit pas les liens par défaut
+
+## Contre‑exemples
+
+37 lignes citées introuvables sur 39 : un « introuvable » sans plus proche voisin se lit comme « ce code n'existe pas »
 
 ## Ce qu'il lui faut
 

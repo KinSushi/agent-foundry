@@ -1,6 +1,6 @@
 # detecter_os
 
-> OMISE
+> Sur quel système cette machine tourne-t-elle ?
 
 ## Comment s'en servir
 
@@ -38,7 +38,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-La détection CPU est limitée aux informations accessibles sans privilèges root.
+Ne détecte pas les conteneurs ou machines virtuelles comme entités séparées. La détection CPU est limitée aux informations accessibles sans privilèges root.
+
+## Contre‑exemples
+
+Sur certains systèmes BSD, la détection de la distribution peut échouer.
 
 ## Ce qu'il lui faut
 

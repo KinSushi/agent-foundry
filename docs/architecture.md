@@ -1,6 +1,6 @@
 # architecture
 
-> casse le plus de choses ?
+> par quoi commencer pour comprendre ce dépôt, et qu'est‑ce qui casse le plus de choses ?
 
 ## Comment s'en servir
 
@@ -49,7 +49,7 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-(level > 0) sont résolus de façon simple, ce qui peut manquer d’arêtes internes à un paquet CONTRE‑EXEMPLES la mesure initiale ne prenait que level == 0 et sous‑comptait les arêtes — le défaut était dans l’instrument, pas dans networkx
+ne voit pas les imports dynamiques ; les imports relatifs (level > 0) sont résolus de façon simple, ce qui peut manquer d’arêtes internes à un paquet CONTRE‑EXEMPLES la mesure initiale ne prenait que level == 0 et sous‑comptait les arêtes — le défaut était dans l’instrument, pas dans networkx
 
 ## Ce qu'il lui faut
 

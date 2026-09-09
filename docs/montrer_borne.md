@@ -1,6 +1,6 @@
 # montrer_borne
 
-> OMISE
+> comment montrer cette structure sans saturer le lecteur ?
 
 ## Comment s'en servir
 
@@ -42,11 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-n'est plus du JSON valide ; un objet à __repr__ coûteux ou récursif peut piéger
+les bornes reprlib sont PAR DIMENSION, pas globales ; la sortie n'est plus du JSON valide ; un objet à __repr__ coûteux ou récursif peut piéger
 
 ## Contre‑exemples
 
-dire sans mesure de la sortie
+maxdict=1000 rend 23 268 caractères — « borné » ne veut rien dire sans mesure de la sortie
 
 ## Ce qu'il lui faut
 

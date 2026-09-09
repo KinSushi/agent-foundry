@@ -1,6 +1,6 @@
 # voir_image
 
-> OMISE
+> Que montre cette image, et où sont les objets/contours ?
 
 ## Comment s'en servir
 
@@ -43,7 +43,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Pas de détection si OpenCV absent, ou image non lisible, ou très floue.
+
+## Contre‑exemples
+
+Une image monochrome sans contraste ne produit aucun contour.
 
 ## Ce qu'il lui faut
 

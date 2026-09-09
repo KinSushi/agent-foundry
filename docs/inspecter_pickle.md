@@ -1,6 +1,6 @@
 # inspecter_pickle
 
-> OMISE
+> que fera ce pickle si je le charge ?
 
 ## Comment s'en servir
 
@@ -40,11 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-ne dit pas ce que le code appelé FAIT ; ne couvre pas les protocoles futurs
+un nom peut être construit dynamiquement et échapper à la liste ; ne dit pas ce que le code appelé FAIT ; ne couvre pas les protocoles futurs
 
 ## Contre‑exemples
 
-un verdict fondé sur les seuls opcodes refuse tout transport légitime
+cloudpickle emploie REDUCE et STACK_GLOBAL comme un pickle piégé — un verdict fondé sur les seuls opcodes refuse tout transport légitime
 
 ## Ce qu'il lui faut
 

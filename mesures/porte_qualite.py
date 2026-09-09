@@ -932,6 +932,10 @@ def juger_tous(chemins: List[Path]) -> Dict:
                 fichiers.append(chemin_relatif_racine)
             else:
                 print(f"Fichier introuvable: {chemin} (essayé: {chemin_absolu} et {chemin_relatif_racine})", file=sys.stderr)
+        elif chemin_absolu.is_dir():
+            # Un dossier vaut l'ensemble de ses *.py ; sans ce dépliage, la porte
+            # ouvrait le dossier comme un fichier et tuait tout le lot (KeyError 'FATAL').
+            fichiers.extend(sorted(chemin_absolu.glob("*.py")))
         else:
             fichiers.append(chemin_absolu)
 
@@ -983,6 +987,7 @@ def juger_tous(chemins: List[Path]) -> Dict:
         toutes_les_avertissements.extend(j.get("avertissements", []))
         for verdict in j["verdicts"]:
             code = verdict["code"]
+            controles_stats.setdefault(code, {"total": 0, "manquements": 0})
             controles_stats[code]["total"] += 1
             if verdict["verdict"] == "MANQUEMENT":
                 controles_stats[code]["manquements"] += 1

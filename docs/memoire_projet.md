@@ -1,6 +1,6 @@
 # memoire_projet
 
-> OMISE
+> ce que je crois savoir de ce projet est-il encore vrai ?
 
 ## Comment s'en servir
 
@@ -47,7 +47,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-ne voit pas un changement dans un fichier non déclaré ; la recherche de termes utilise re.search (faux positifs possibles)
+ne détecte pas qu'une entrée était FAUSSE dès l'écriture ; ne voit pas un changement dans un fichier non déclaré ; la recherche de termes utilise re.search (faux positifs possibles)
+
+## Contre‑exemples
+
+une entrée qui ne déclare aucun fichier est classée comme NON VÉRIFIABLE (et non VALIDE)
 
 ## Ce qu'il lui faut
 

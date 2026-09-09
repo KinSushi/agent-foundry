@@ -1,6 +1,6 @@
 # resumer_texte
 
-> OMISE
+> Quel est le résumé de ce texte ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Aucun modèle externe n’est garanti d’être installé. Le résumé naïf ne garantit pas la pertinence sémantique.
+
+## Contre‑exemples
+
+Texte très long sans ponctuation claire ou texte non‑textuel.
 
 ## Ce qu'il lui faut
 

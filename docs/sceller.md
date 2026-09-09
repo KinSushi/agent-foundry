@@ -1,6 +1,6 @@
 # sceller
 
-> OMISE
+> Ce que je scelle aujourd’hui a‑t‑il changé demain ?
 
 ## Comment s'en servir
 
@@ -47,11 +47,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-rien, il constate ; il repose sur _hashlib.pyd, dont l’immunité est empirique
+L’outil indique QU’IL A CHANGÉ, jamais QUOI ; il ne protège de rien, il constate ; il repose sur _hashlib.pyd, dont l’immunité est empirique
 
 ## Contre‑exemples
 
-et ne détecte plus rien
+un sceau rangé DANS l’arbre qu’il scelle se met à jour avec lui et ne détecte plus rien
 
 ## Ce qu'il lui faut
 

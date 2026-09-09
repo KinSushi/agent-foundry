@@ -1,6 +1,6 @@
 # verifier_imports
 
-> OMISE
+> ces imports existent-ils, et si non, que faut-il en faire ?
 
 ## Comment s'en servir
 
@@ -42,11 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-le nom d'import diffère parfois du nom de distribution ; un import dans un try/except ImportError est légitime ; les imports dynamiques (importlib.import_module(nom)) échappent ; modulefinder rate les imports dynamiques et rapporte les imports conditionnels même non exécutés
+un 200 sur PyPI ne prouve PAS l'innocuité — slopsquatting ; le nom d'import diffère parfois du nom de distribution ; un import dans un try/except ImportError est légitime ; les imports dynamiques (importlib.import_module(nom)) échappent ; modulefinder rate les imports dynamiques et rapporte les imports conditionnels même non exécutés
 
 ## Contre‑exemples
 
-0.8.0 sur PyPI — accuser un import légitime est la faute que cet outil doit éviter
+`fastapi_utils` classé ABSENT par la mesure locale existe en 0.8.0 sur PyPI — accuser un import légitime est la faute que cet outil doit éviter
 
 ## Ce qu'il lui faut
 

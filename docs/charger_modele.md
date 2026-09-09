@@ -1,6 +1,6 @@
 # charger_modele
 
-> OMISE
+> Quel modèle est disponible localement ?
 
 ## Comment s'en servir
 
@@ -38,7 +38,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne détecte pas les modèles qui ne suivent pas la structure standard ou qui sont partiellement téléchargés.
+
+## Contre‑exemples
+
+Un répertoire sans fichiers caractéristiques n'est pas considéré comme un modèle.
 
 ## Ce qu'il lui faut
 

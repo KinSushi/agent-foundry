@@ -1,6 +1,6 @@
 # paralleliser
 
-> OMISE
+> ce travail gagne-t-il à être reparti sur plusieurs interpréteurs ?
 
 ## Comment s'en servir
 
@@ -45,11 +45,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-La création d'un interpréteur coûte ≈ 9,7 ms → un pool est obligatoire. Les objets de classe personnalisée lèvent ``NotShareableError``.
+``exec`` est synchrone ; seul ``call_in_thread`` parallélise. La création d'un interpréteur coûte ≈ 9,7 ms → un pool est obligatoire. Les objets de classe personnalisée lèvent ``NotShareableError``.
 
 ## Contre‑exemples
 
-à « aucun gain ». Avec ``call_in_thread`` le gain est 2,5×-3,5×.
+deux mesures antérieures utilisaient ``exec`` et concluaient à « aucun gain ». Avec ``call_in_thread`` le gain est 2,5×-3,5×.
 
 ## Ce qu'il lui faut
 

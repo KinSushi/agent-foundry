@@ -1,6 +1,6 @@
 # livrer_autonome
 
-> OMISE
+> cet outil peut-il voyager en un seul fichier ?
 
 ## Comment s'en servir
 
@@ -48,11 +48,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+ne voit pas les imports dynamiques ; ne teste pas la machine cible
 
 ## Contre‑exemples
 
-la vérification d'exécution obligatoire
+une archive peut se construire et ne pas s'exécuter — d'où la vérification d'exécution obligatoire
 
 ## Ce qu'il lui faut
 

@@ -1,6 +1,6 @@
 # verifier_docstring
 
-> OMISE
+> cette docstring décrit-elle la fonction qui existe ?
 
 ## Comment s'en servir
 
@@ -41,11 +41,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-n'est pas comparable ; *args et **kwargs échappent au croisement
+ne vérifie pas que la DESCRIPTION est vraie, seulement la structure ; un type écrit en prose (« un entier positif ») n'est pas comparable ; *args et **kwargs échappent au croisement
 
 ## Contre‑exemples
 
-les confondre accuserait toute docstring sans types
+type_name is None signifie « non écrit », pas « faux » — les confondre accuserait toute docstring sans types
 
 ## Ce qu'il lui faut
 

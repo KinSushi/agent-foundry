@@ -1,6 +1,6 @@
 # journaliser_structure
 
-> OMISE
+> Comment enregistrer les événements de manière exploitable ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+L'outil ne voit que le code source, pas le comportement à l'exécution ni la configuration dynamique des handlers.
+
+## Contre‑exemples
+
+Un script qui écrit dans un fichier binaire ou qui utilise sys.stdout.write directement sans passer par logging.
 
 ## Ce qu'il lui faut
 

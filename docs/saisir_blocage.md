@@ -1,6 +1,6 @@
 # saisir_blocage
 
-> OMISE
+> ce programme est‑il bloqué, et où exactement ?
 
 ## Comment s'en servir
 
@@ -44,7 +44,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+tue le PROCESSUS, pas un thread ni un sous‑interpréteur ; ne borne PAS la mémoire ; sur un blocage dans du code C sans retour au boucleur, la minuterie peut ne pas se déclencher
+
+## Contre‑exemples
+
+StringIO comme sortie -> UnsupportedOperation ; et un `armer` sans cancel tue la tâche SUIVANTE ; un appel à faulthandler.dump_traceback_later portait un paramètre all_threads qui n'existe pas ; l'outil levait TypeError au moment précis où il devait sauver la session. Aucune porte de forme ne pouvait le voir : seule la confrontation à la signature réelle le montre.
 
 ## Ce qu'il lui faut
 

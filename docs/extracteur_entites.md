@@ -1,6 +1,6 @@
 # extracteur_entites
 
-> OMISE
+> Quelles entités (noms, dates) sont présentes ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Python pur ne fait pas de véritable NER. La détection des noms est basique. pycountry améliore la détection des pays.
+
+## Contre‑exemples
+
+Paris peut être un nom commun. Avril peut être un prénom.
 
 ## Ce qu'il lui faut
 

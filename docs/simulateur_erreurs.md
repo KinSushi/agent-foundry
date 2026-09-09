@@ -1,6 +1,6 @@
 # simulateur_erreurs
 
-> OMISE
+> Comment un code réagit-il à des erreurs système ?
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-La simulation dépend des permissions et de l'environnement d'exécution.
+Ne simule pas toutes les erreurs système possibles, seulement celles implémentables via les modules standard. La simulation dépend des permissions et de l'environnement d'exécution.
+
+## Contre‑exemples
+
+Un code qui gère explicitement une erreur système peut ne pas lever d'exception malgré la simulation.
 
 ## Ce qu'il lui faut
 

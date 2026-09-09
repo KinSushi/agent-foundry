@@ -1,6 +1,6 @@
 # validateur_i18n
 
-> OMISE
+> Ces chaînes sont-elles bien encodées ?
 
 ## Comment s'en servir
 
@@ -42,7 +42,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Ne vérifie pas les encodages dynamiques ou non standard. Se base sur les encodages connus de la stdlib.
+
+## Contre‑exemples
+
+Un encodage valide mais non supporté par Python (ex: encodages propriétaires).
 
 ## Ce qu'il lui faut
 

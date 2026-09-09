@@ -1,6 +1,6 @@
 # tracer_llm
 
-> OMISE
+> Quelles traces ce flux LLM a-t-il laissées ?
 
 ## Comment s'en servir
 
@@ -39,7 +39,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Nous ne détectons pas les traces envoyées à un point de terminaison distant (sans fichier local) si aucune variable d'environnement pertinente n'est définie. Nous ne examinons pas les traces dans les journaux standards ou autres systèmes de stockage.
+
+## Contre‑exemples
+
+Un flux LLM qui utilise Langfuse mais avec toutes les variables d'environnement définies sur des chaînes vides ne serait pas détecté. De même, un exportateur fichier configuré avec un répertoire inaccessible ou sans préfixe correspondant à aucun fichier ne serait pas détecté.
 
 ## Ce qu'il lui faut
 

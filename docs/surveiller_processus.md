@@ -1,6 +1,6 @@
 # surveiller_processus
 
-> OMISE
+> Quels processus tournent, et comment les superviser ?
 
 ## Comment s'en servir
 
@@ -43,7 +43,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Redémarrage limité à la commande fournie via --cmd, sinon aucun redémarrage.
+
+## Contre‑exemples
+
+Processus système protégés ne peuvent être redémarrés.
 
 ## Ce qu'il lui faut
 

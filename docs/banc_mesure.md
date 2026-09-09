@@ -1,6 +1,6 @@
 # banc_mesure
 
-> OMISE
+> cette voie est-elle vraiment plus rapide que celle-là ?
 
 ## Comment s'en servir
 
@@ -46,11 +46,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-la fréquence rendue par py-cpuinfo est ANNONCÉE, pas mesurée ; un cache chaud change le classement ; une seule mesure aberrante (ramasse-miettes, préemption) fausse l'étendue min→max
+tracemalloc actif fausse le temps -- mesure ×2,6 sur math.sumprod ; la fréquence rendue par py-cpuinfo est ANNONCÉE, pas mesurée ; un cache chaud change le classement ; une seule mesure aberrante (ramasse-miettes, préemption) fausse l'étendue min→max
 
 ## Contre‑exemples
 
-même à +50 % de travail -- l'étendue ne décroît pas avec les répétitions, le bruit standard si ; une seule mesure NaN empoisonne la médiane en silence
+le critère par étendue min→max refusait de conclure 4 fois sur 4, même à +50 % de travail -- l'étendue ne décroît pas avec les répétitions, le bruit standard si ; une seule mesure NaN empoisonne la médiane en silence
 
 ## Ce qu'il lui faut
 

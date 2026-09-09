@@ -1,6 +1,6 @@
 # valider_email
 
-> OMISE
+> Cette adresse email est-elle valide ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Sans modules tierces, seule la syntaxe de base est verifiee (mode degrade).
+
+## Contre‑exemples
+
+Une adresse syntaxiquement valide mais sans boite receptrice renvoie valide en mode degrade.
 
 ## Ce qu'il lui faut
 

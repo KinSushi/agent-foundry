@@ -1,6 +1,6 @@
 # verifier_exemples
 
-> OMISE
+> les exemples de cette documentation sont-ils vrais ?
 
 ## Comment s'en servir
 
@@ -46,11 +46,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-échoue sans être faux ; doctest compare la REPRÉSENTATION textuelle — 0.1+0.2 ne vaut pas 0.3 ; exemples non déterministes (aléatoire, heure, etc.) échouent sans être faux
+un exemple qui dépend de l'heure, du hasard ou d'un chemin échoue sans être faux ; doctest compare la REPRÉSENTATION textuelle — 0.1+0.2 ne vaut pas 0.3 ; exemples non déterministes (aléatoire, heure, etc.) échouent sans être faux
 
 ## Contre‑exemples
 
-sans le compte `attempted`
+0 exemple exécuté rend « 0 échec » — indiscernable du succès sans le compte `attempted`
 
 ## Ce qu'il lui faut
 

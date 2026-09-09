@@ -1,6 +1,6 @@
 # banc_agent
 
-> OMISE
+> qu'est-ce que ce travail a réellement coûté ?
 
 ## Comment s'en servir
 
@@ -45,11 +45,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-l'échantillon est invisible ; le coût d'un appel réseau (modèle distant) n'est pas mesurable localement
+resource n'existe pas sous Windows ; un processus terminé avant l'échantillon est invisible ; le coût d'un appel réseau (modèle distant) n'est pas mesurable localement
 
 ## Contre‑exemples
 
-travaillé 192 ms — mesuré, et le zéro passe pour un résultat
+mesurer le parent seul rend 0 ms de CPU alors que l'enfant a travaillé 192 ms — mesuré, et le zéro passe pour un résultat
 
 ## Ce qu'il lui faut
 

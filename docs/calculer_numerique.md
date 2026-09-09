@@ -1,6 +1,6 @@
 # calculer_numerique
 
-> OMISE
+> Quel est le résultat numérique de cette expression ?
 
 ## Comment s'en servir
 
@@ -40,7 +40,11 @@ Avec `--json`, un objet JSON portant `denominateur` — le nombre d'éléments r
 
 ## Ce qu'il ne fait pas
 
-OMISE
+Sans bibliothèque tierce, seuls les calculs standards en virgule flottante ou décimaux simples sont possibles.
+
+## Contre‑exemples
+
+Une expression syntaxiquement valide mais mathématiquement indéfinie (ex: 1/0) lèvera une erreur.
 
 ## Ce qu'il lui faut
 
