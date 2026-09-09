@@ -555,9 +555,25 @@ def _test_f3_f4(
     Tuple[List[str], str] | None,
     List[Dict[str, Any]],
 ]:
-    json_obj, invocation, inapplicable, attempts, legit_refusal, declared, declared_failures = _obtenir_json(
-        copie, cwd, délai, piece_valide
-    )
+    try:
+        json_obj, invocation, inapplicable, attempts, legit_refusal, declared, declared_failures = _obtenir_json(
+            copie, cwd, délai, piece_valide
+        )
+    except (ValueError, TypeError) as exc:
+        # Défaut du juge : on rattrape et on marque comme NON EPROUVE avec cause spécifique
+        f3 = {
+            "code": "F3",
+            "intitule": "F3 TRAVAIL",
+            "verdict": "NON EPROUVE",
+            "explication": f"Défaut du juge : {type(exc).__name__} - {str(exc)}",
+        }
+        f4 = {
+            "code": "F4",
+            "intitule": "F4 DÉNOMINATEUR",
+            "verdict": "NON EPROUVE",
+            "explication": "Défaut du juge lors de l'exécution de F3",
+        }
+        return f3, f4, None, None, False, [], None, []
 
     # Gestion du cas INAPPLICABLE (réseau ou clé API obligatoire)
     if inapplicable:
@@ -696,6 +712,16 @@ def _test_f5(
     invocation: List[str] | None,
 ) -> Mapping[str, Any]:
     """Détecte les fabrications (contrôle F5)."""
+    try:
+        json_obj, _, _, _, _, _, _ = _obtenir_json(copie, cwd, délai, piece_valide)
+    except (ValueError, TypeError) as exc:
+        return {
+            "code": "F5",
+            "intitule": "F5 ANCRAGE",
+            "verdict": "NON EPROUVE",
+            "explication": f"Défaut du juge : {type(exc).__name__} - {str(exc)}",
+        }
+
     if invocation is None or piece_valide.name not in invocation[1:]:
         return {
             "code": "F5",
@@ -703,8 +729,6 @@ def _test_f5(
             "verdict": "INAPPLICABLE",
             "explication": "Invocation réussie ne passe pas le fichier témoin",
         }
-
-    json_obj, _, _, _, _ = _obtenir_json(copie, cwd, délai, piece_valide)
 
     if json_obj is None:
         return {
@@ -1102,9 +1126,36 @@ except ValueError:
 
         f1 = _test_f1(copie, tmp_dir, delai)
         f2 = _test_f2(copie, tmp_dir, delai)
-        f3, f4, denom, invocation, f3_inapp, attempts, legit_refusal, declared_failures = _test_f3_f4(
-            copie, tmp_dir, delai, piece_valide
-        )
+        try:
+            f3, f4, denom, invocation, f3_inapp, attempts, legit_refusal, declared_failures = _test_f3_f4(
+                copie, tmp_dir, delai, piece_valide
+            )
+        except (ValueError, TypeError) as exc:
+            # Défaut du juge : on rattrape et on marque comme NON EPROUVE avec cause spécifique
+            f3 = {
+                "code": "F3",
+                "intitule": "F3 TRAVAIL",
+                "verdict": "NON EPROUVE",
+                "explication": f"Défaut du juge : {type(exc).__name__} - {str(exc)}",
+            }
+            f4 = {
+                "code": "F4",
+                "intitule": "F4 DÉNOMINATEUR",
+                "verdict": "NON EPROUVE",
+                "explication": "Défaut du juge lors de l'exécution de F3",
+            }
+            f5 = {
+                "code": "F5",
+                "intitule": "F5 ANCRAGE",
+                "verdict": "NON EPROUVE",
+                "explication": "Défaut du juge lors de l'exécution de F3/F4",
+            }
+            f3_inapp = False
+            denom = None
+            invocation = None
+            attempts = []
+            legit_refusal = None
+            declared_failures = []
 
         mouchard_dir = Path(tempfile.mkdtemp())
         journal_path = Path(tempfile.mktemp())
@@ -1261,6 +1312,15 @@ except ValueError:
         if reverse_hors_sujet:
             report_dict["reverse_hors_sujet"] = reverse_hors_sujet
 
+        # Vérification des défauts du juge
+        juge_en_defaut = any(
+            d["verdict"] == "NON EPROUVE" and "Défaut du juge" in d.get("explication", "")
+            for d in details
+        )
+        if juge_en_defaut:
+            report_dict["verdict"] = "NON EPROUVE"
+            report_dict["cause"] = "defaut du juge"
+
         return report_dict
 
     finally:
@@ -1273,14 +1333,19 @@ except ValueError:
 def eprouver_tous(chemins: List[Path], delai: float, controle_positif: Mapping[str, Any]) -> Mapping[str, Any]:
     """Applique l’isolement à tous les outils et agrège les résultats."""
     rapports: List[Mapping[str, Any]] = []
+    juge_en_defaut_count = 0
+
     for p in chemins:
         try:
             rapport = eprouver_isolement(p, delai, controle_positif)
+            if rapport.get("cause") == "defaut du juge":
+                juge_en_defaut_count += 1
         except Exception as exc:
             rapport = {
                 "plateforme": _plateforme(),
                 "chemin": str(p),
                 "verdict": "NON EPROUVE",
+                "cause": "defaut du juge",
                 "details": [],
                 "denominateur": 0,
                 "explication": f"{type(exc).__name__}: {exc}",
@@ -1290,6 +1355,7 @@ def eprouver_tous(chemins: List[Path], delai: float, controle_positif: Mapping[s
                 "tentatives_f3_f4": [],
                 "controle_positif_mouchard": controle_positif,
             }
+            juge_en_defaut_count += 1
         rapports.append(rapport)
 
     denom_total = sum(
@@ -1302,6 +1368,9 @@ def eprouver_tous(chemins: List[Path], delai: float, controle_positif: Mapping[s
     for r in rapports:
         v = r["verdict"]
         par_verdict[v] = par_verdict.get(v, 0) + 1
+
+    if juge_en_defaut_count > 0:
+        par_verdict["JUGE EN DEFAUT"] = juge_en_defaut_count
 
     lot_suspect = False
     total = len(rapports)
@@ -1429,7 +1498,7 @@ def main() -> int:
                 sys.stdout.write(f"  {v}: {c}\n")
             sys.stdout.write(f"Dénominateur total: {resultat['denominateur']}\n")
 
-    if any(r["verdict"] == "NON EPROUVE" for r in resultat["rapports"]):
+    if any(r["verdict"] == "NON EPROUVE" and r.get("cause") != "defaut du juge" for r in resultat["rapports"]):
         return 4
     if any(r["verdict"] == "INAPPLICABLE" for r in resultat["rapports"]):
         return 2

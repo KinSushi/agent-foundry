@@ -6,7 +6,7 @@ HYPOTHÈSES
 Les fichiers de mesures existent et sont lisibles.
 LIMITES
 Pas de mesures de type dynamique, uniquement ce qui est sur le disque.
-CONTRE-EXEMPLES
+CONTRE-EXEMPLE
 Un README dont les chiffres sont tapés à la main se périme au premier commit.
 DOMAINE
 Outils de diffusion de projets Python purement stdlib.
@@ -355,6 +355,66 @@ def _verifier_trous(readme: str) -> Tuple[int, List[str]]:
             erreurs.append(f"Ligne {readme[:block.start()].count(chr(10)) + contenu[:trou.start()].count(chr(10)) + 2}: trou '<...>' dans un bloc de code '{trou.group(0)}'")
     return len(erreurs), erreurs
 
+# Template for the README with named tokens.
+README_TEMPLATE = """\
+![banniere](@@BANNIERE_URL@@)
+
+@@BADGES@@
+
+# @@TITRE@@
+
+> @@DESCRIPTION@@
+
+@@TOTAL_OUTILS@@ outils en ligne de commande pour les agents IA. Chacun donne à l'agent une capacité qu'il n'a pas, ou rend meilleur ce qu'il fait mal : refuser de conclure sur rien, détecter une API inventée, dire ce qu'il a réellement examiné.
+
+Bibliothèque standard seule. Aucune dépendance obligatoire. Et rien n'est publié sur parole : **les @@TOTAL_OUTILS@@ outils sont prouvés en isolation totale, sur deux plateformes**, par un juge qui se prouve d'abord lui-même.
+
+@@TABLEAU_ETAT@@
+
+## Démarrage
+
+Aucune installation. Python 3.14, et c'est tout.
+
+```bash
+@@COMMANDES_INSTALL@@
+```
+
+Chaque outil documente ses arguments par `--help`, rend du JSON avec `--json`, et publie `denominateur` — le nombre d'éléments qu'il a réellement examinés. Un outil qui n'a rien à examiner refuse de conclure et le dit.
+
+Trois pour commencer :
+
+| Outil | Ce qu'il répond |
+|---|---|
+@@OUTILS_EXEMPLES@@
+
+Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque : `pip install .[tout]` (n'installe que les bibliothèques optionnelles ; les outils restent des scripts).
+
+### Reproduire l'audit complet
+
+La construction rejoue la porte de qualité et le juge d'isolation **à l'intérieur de l'image**. Si un seul outil échoue, l'image n'existe pas.
+
+```bash
+docker build -t @@DEPO_NOM@@ .
+```
+
+@@OUTILS_SECTION@@
+
+## Comment c'est mesuré
+@@MESURES@@
+
+## Ce que cette boîte NE fait PAS
+@@LIMITES@@
+
+@@COMMENTAIRE_PRODUCTION@@
+## Licence
+
+[AGPL-3.0-or-later](LICENSE). En clair : vous pouvez utiliser, modifier 
+et redistribuer ce code, y compris en le faisant tourner comme service 
+réseau — à condition de publier vos modifications sous la même licence.
+
+@@COPYRIGHT@@
+"""
+
 def generer_readme(
     banniere_url: str,
     description: str,
@@ -376,7 +436,8 @@ def generer_readme(
     auteur: str | None = None,
     copyright_text: str | None = None,
 ) -> str:
-    """Construit le README complet avec les sections demandées."""
+    """Construit le README complet avec les sections demandées, en utilisant un gabarit unique."""
+    # Badges (conservés comme chaîne)
     badges = (
         f"![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue) "
         f"![Python](https://img.shields.io/badge/python-3.14-blue) "
@@ -385,88 +446,53 @@ def generer_readme(
         f"![Plateformes](https://img.shields.io/badge/plateformes-2-brightgreen)"
     )
 
+    # Commandes d'installation/démarrage
     depot_nom = _get_depot_name(depot_url)
     commandes_install = []
     if depot_url:
         commandes_install.append(f"git clone {depot_url} && cd {depot_nom}")
     commandes_install.append(f"python outils/{exemples[0][0]}.py --help" if exemples else "python outils/<outil>.py --help")
+    commandes_install_str = "\n".join(commandes_install)
 
-    parts = [
-        f"![banniere]({banniere_url})",
-        "",
-        badges,
-        "",
-        f"# {titre}",
-        "",
-        f"> {description}",
-        "",
-        f"{total_outils} outils en ligne de commande pour les agents IA. Chacun donne à l'agent une capacité qu'il n'a pas, ou rend meilleur ce qu'il fait mal : refuser de conclure sur rien, détecter une API inventée, dire ce qu'il a réellement examiné.",
-        "",
-        f"Bibliothèque standard seule. Aucune dépendance obligatoire. Et rien n'est publié sur parole : **les {total_outils} outils sont prouvés en isolation totale, sur deux plateformes**, par un juge qui se prouve d'abord lui-même.",
-        "",
-        tableau_etat,
-        "",
-        "## Démarrage",
-        "",
-        "Aucune installation. Python 3.14, et c'est tout.",
-        "",
-        "```bash",
-        "\n".join(commandes_install),
-        "```",
-        "",
-        "Chaque outil documente ses arguments par `--help`, rend du JSON avec `--json`, et publie `denominateur` — le nombre d'éléments qu'il a réellement examinés. Un outil qui n'a rien à examiner refuse de conclure et le dit.",
-        "",
-        "Trois pour commencer :",
-        "",
-        "| Outil | Ce qu'il répond |",
-        "|---|---|",
-    ]
+    # Exemples d'outils (trois premiers)
+    exemples_rows = []
+    for nom, question in exemples[:3]:
+        exemples_rows.append(f"| [{nom}](docs/{nom}.md) | {question} |")
+    exemples_str = "\n".join(exemples_rows)
 
-    for nom, question in exemples:
-        parts.append(f"| [{nom}](docs/{nom}.md) | {question} |")
+    # Dépôt pour la ligne Docker
+    depot_nom_for_docker = depot_nom if depot_nom else "vitrine"
 
-    parts.extend([
-        "",
-        "Certains outils font davantage si une bibliothèque tierce est présente, et le disent sur stderr quand elle manque : `pip install .[tout]`.",
-        "",
-        "### Reproduire l'audit complet",
-        "",
-        "La construction rejoue la porte de qualité et le juge d'isolation **à l'intérieur de l'image**. Si un seul outil échoue, l'image n'existe pas.",
-        "",
-        "```bash",
-        f"docker build -t {depot_nom} .",
-        "```",
-        "",
-        outils_section,
-        "",
-        "## Comment c'est mesuré",
-        mesures,
-        "",
-        "## Ce que cette boîte NE fait PAS",
-        limites,
-        "",
-        commentaire_production,
-        "## Licence",
-        "",
-        f"[AGPL-3.0-or-later](LICENSE). En clair : vous pouvez utiliser, modifier ",
-        "et redistribuer ce code, y compris en le faisant tourner comme service ",
-        "réseau — à condition de publier vos modifications sous la même licence.",
-        "",
-    ])
-
-    # Ligne juridique de copyright
+    # Copyright
     if copyright_text is not None:
-        parts.append(copyright_text)
+        copyright_line = copyright_text
     elif auteur:
-        parts.append(f"Copyright (C) {annee} {auteur}")
+        copyright_line = f"Copyright (C) {annee} {auteur}"
+    else:
+        copyright_line = ""
 
-    # Signature conforme (reste inchangée)
-    if auteur:
-        parts.append("")
-        parts.append("---")
-        parts.append(f"Auteur — {auteur}")
+    # Mapping des tokens
+    mapping = {
+        "@@BANNIERE_URL@@": banniere_url,
+        "@@BADGES@@": badges,
+        "@@TITRE@@": titre,
+        "@@DESCRIPTION@@": description,
+        "@@TOTAL_OUTILS@@": str(total_outils),
+        "@@TABLEAU_ETAT@@": tableau_etat,
+        "@@COMMANDES_INSTALL@@": commandes_install_str,
+        "@@OUTILS_EXEMPLES@@": exemples_str,
+        "@@DEPO_NOM@@": depot_nom_for_docker,
+        "@@OUTILS_SECTION@@": outils_section,
+        "@@MESURES@@": mesures,
+        "@@LIMITES@@": limites,
+        "@@COMMENTAIRE_PRODUCTION@@": commentaire_production,
+        "@@COPYRIGHT@@": copyright_line,
+    }
 
-    readme = "\n".join(parts) + "\n"
+    readme = README_TEMPLATE
+    for token, value in mapping.items():
+        readme = readme.replace(token, value)
+
     # Vérification des trous
     nb_trous, erreurs = _verifier_trous(readme)
     if nb_trous > 0:
@@ -557,7 +583,7 @@ def generer_pyproject(
 
     lines = [
         "[build-system]",
-        'requires = ["setuptools>=68"]',
+        'requires = ["setuptools>=77"]',
         'build-backend = "setuptools.build_meta"',
         "",
         "[project]",
@@ -566,9 +592,9 @@ def generer_pyproject(
         f'description = "{description}"',
         'requires-python = ">=3.14"',
         'readme = "README.md"',
-        'license = {text = "AGPL-3.0-or-later"}',
+        'license = "AGPL-3.0-or-later"',
+        'license-files = ["LICENSE"]',
         "classifiers = [",
-        '    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",',
         '    "Programming Language :: Python :: 3",',
         '    "Programming Language :: Python :: 3 :: Only",',
         "]",
@@ -578,6 +604,12 @@ def generer_pyproject(
         opt_lines,
         tout_line,
         imports_nr_section.rstrip(),
+        "",
+        "[tool.setuptools]",
+        "# Aucun module installe : les outils se lancent par `python outils/NOM.py`.",
+        "# Ce fichier n'existe que pour les extras optionnels ci-dessous.",
+        "packages = []",
+        "",
     ]
     content = "\n".join(line for line in lines if line) + "\n"
     return content
@@ -1259,7 +1291,7 @@ def engendrer(
         ]
     )
 
-    # Assemble le README
+    # Assemble le README via le gabarit unique
     readme = generer_readme(
         banniere_url=banniere_url,
         description=description,

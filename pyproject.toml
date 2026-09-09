@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "agent-foundry"
@@ -7,9 +7,9 @@ version = "0.1.0"
 description = "Increase what AI can produce"
 requires-python = ">=3.14"
 readme = "README.md"
-license = {text = "AGPL-3.0-or-later"}
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
 classifiers = [
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
 ]
@@ -26,3 +26,7 @@ tout = ['Jinja2>=3.1.6', 'RestrictedPython>=8.5', 'backoff>=2.2.1', 'click>=8.5.
 [tool.vitrine]
 # imports non résolus sur la machine de mesure
 imports_non_resolus = ['test', 'zstandard']
+[tool.setuptools]
+# Aucun module installe : les outils se lancent par `python outils/NOM.py`.
+# Ce fichier n'existe que pour les extras optionnels ci-dessous.
+packages = []
