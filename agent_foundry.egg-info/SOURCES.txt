@@ -1,8 +1,0 @@
-LICENSE
-README.md
-pyproject.toml
-agent_foundry.egg-info/PKG-INFO
-agent_foundry.egg-info/SOURCES.txt
-agent_foundry.egg-info/dependency_links.txt
-agent_foundry.egg-info/requires.txt
-agent_foundry.egg-info/top_level.txt
