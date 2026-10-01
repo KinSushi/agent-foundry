@@ -1046,6 +1046,10 @@ def main() -> int:
 
     if args.json:
         print(json.dumps(resultat, indent=2, ensure_ascii=False))
+        # Socle §10 : rien à examiner rend 3, en JSON comme en texte (rendait 0 en JSON).
+        if resultat["denominateur"] == 0:
+            print(resultat["message"], file=sys.stderr)
+            return 3
     else:
         if resultat["denominateur"] == 0:
             print(resultat["message"])

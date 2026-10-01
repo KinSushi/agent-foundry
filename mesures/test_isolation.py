@@ -3,6 +3,14 @@
 Ce module exécute les contrôles décrits dans le socle, en s’assurant que le
 détecteur de fuites (le « mouchard ») est bien armé.  Il génère un rapport JSON
 contenant, entre autres, le résultat du contrôle positif du mouchard.
+
+Codes de sortie — seul 0 veut dire « tous LIVRABLE » :
+    0  tous les outils LIVRABLE
+    1  au moins un REVERSE KO ou une FUITE
+    2  au moins un FORWARD KO, BLOQUE, INAPPLICABLE ou verdict inconnu ; aucun outil trouvé
+    3  dénominateur total nul
+    4  mouchard AVEUGLE, ou au moins un outil NON EPROUVE (y compris par défaut du juge)
+    5  contrôle positif NON MESURABLE, ou interpréteur introuvable
 """
 
 from __future__ import annotations
@@ -1293,7 +1301,8 @@ except ValueError:
         else:
             verdict = "LIVRABLE"
 
-        if not any(d["verdict"] == "ECHEU" for d in forward_controls + reverse_controls) and verdict != "LIVRABLE":
+        # R5..R7 comptent : sans eux, tout verdict FUITE était signalé à tort comme « sans echec ».
+        if not any(d["verdict"] == "ECHEU" for d in details) and verdict != "LIVRABLE":
             incoh_msg = f"incoherence : {chemin_outil.name} sans echec mais classe {verdict}"
             print(incoh_msg, file=sys.stderr)
             incoherences.append(incoh_msg)
@@ -1523,15 +1532,21 @@ def main() -> int:
                 sys.stdout.write(f"  {v}: {c}\n")
             sys.stdout.write(f"Dénominateur total: {resultat['denominateur']}\n")
 
-    if any(r["verdict"] == "NON EPROUVE" and r.get("cause") != "defaut du juge" for r in resultat["rapports"]):
+    # Un outil non éprouvé n'est pas livrable, que la faute soit la sienne ou celle du juge.
+    if any(r["verdict"] == "NON EPROUVE" for r in resultat["rapports"]):
         return 4
     if any(r["verdict"] == "INAPPLICABLE" for r in resultat["rapports"]):
         return 2
     if resultat["denominateur"] == 0:
         return 3
-    if resultat["par_verdict"].get("REVERSE KO", 0) > 0:
+    # FUITE manquait ici : un outil qui lisait /etc/hosts hors du bac était classé FUITE
+    # et le juge rendait 0 — la CI et `docker build` le laissaient passer.
+    if resultat["par_verdict"].get("REVERSE KO", 0) > 0 or resultat["par_verdict"].get("FUITE", 0) > 0:
         return 1
     if resultat["par_verdict"].get("FORWARD KO", 0) > 0 or resultat["par_verdict"].get("BLOQUE", 0) > 0:
+        return 2
+    # Filet : tout verdict autre que LIVRABLE, même un verdict qu'on n'a pas encore prévu, est un défaut.
+    if any(r["verdict"] != "LIVRABLE" for r in resultat["rapports"]):
         return 2
     return 0
 

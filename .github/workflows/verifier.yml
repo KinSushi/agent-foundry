@@ -9,6 +9,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.14"
+      - name: Étalons des instruments
+        run: python mesures/eprouver_instruments.py
       - name: Porte de qualité
         run: python mesures/porte_qualite.py outils/*.py --racine .
       - name: Juge d'isolation
