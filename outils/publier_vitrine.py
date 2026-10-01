@@ -440,15 +440,18 @@ def generer_readme(
     annee: int,
     auteur: str | None = None,
     copyright_text: str | None = None,
+    nb_plateformes: int = 0,
+    nb_prouves: int = 0,
 ) -> str:
     """Construit le README complet avec les sections demandées, en utilisant un gabarit unique."""
-    # Badges (conservés comme chaîne)
+    # Badges : chaque chiffre vient d'une mesure ; « plateformes-2 » était écrit en dur.
+    couleur_prouves = "brightgreen" if nb_prouves == total_outils else "orange"
     badges = (
         f"![Licence](https://img.shields.io/badge/licence-AGPL--3.0-blue) "
         f"![Python](https://img.shields.io/badge/python-3.14-blue) "
         f"![Outils](https://img.shields.io/badge/outils-{total_outils}-brightgreen) "
-        f"![Prouvés](https://img.shields.io/badge/prouvés%20en%20isolation-{total_outils}%2F{total_outils}-brightgreen) "
-        f"![Plateformes](https://img.shields.io/badge/plateformes-2-brightgreen)"
+        f"![Prouvés](https://img.shields.io/badge/prouvés%20en%20isolation-{nb_prouves}%2F{total_outils}-{couleur_prouves}) "
+        f"![Plateformes](https://img.shields.io/badge/plateformes-{nb_plateformes}-brightgreen)"
     )
 
     # Commandes d'installation/démarrage
@@ -1221,6 +1224,7 @@ def engendrer(
     # Mesures
     mesures = (
         "- `docker build .` : rejoue la porte et le juge À L'INTÉRIEUR d'une image épinglée par empreinte. Si un seul outil échoue, l'image n'existe pas.\n"
+        "- `mesures/eprouver_instruments.py` : avant tout verdict, la porte et le juge sont rejoués sur des étalons à réponse connue (un outil propre, un outil qui fuit, un chemin en dur, un dossier vide) ; un instrument qui rend un mauvais verdict ou un mauvais code de sortie arrête tout.\n"
         "- `mesures/porte_qualite.py` : 15 contrôles de forme sur chaque outil.\n"
         "- `mesures/test_isolation.py` : chaque outil est copié seul dans un dossier temporaire, appelé de seize façons, avec détection de fuite en lecture, écriture et réseau.\n"
         "Un **VERDICT** peut être : LIVRABLE, FORWARD KO, REVERSE KO, FUITE."
@@ -1321,6 +1325,8 @@ def engendrer(
         annee=annee_courante,
         auteur=auteur,
         copyright_text=copyright_text,
+        nb_plateformes=total_reports,
+        nb_prouves=livrables,
     )
     (cible / "README.md").write_text(readme, encoding="utf-8")
 
