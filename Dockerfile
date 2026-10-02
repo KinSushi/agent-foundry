@@ -5,5 +5,8 @@ RUN python -c "import sys; assert sys.version_info[:3] == (3, 14, 7), sys.versio
 RUN python mesures/eprouver_instruments.py
 RUN python mesures/porte_qualite.py outils/*.py --racine /agent-foundry
 RUN python mesures/test_isolation.py outils --racine /agent-foundry
+RUN useradd --create-home --uid 10001 agent
+USER agent
+HEALTHCHECK NONE
 CMD ["python", "-c", "import pathlib; print(chr(10).join(sorted(p.stem for p in pathlib.Path('outils').glob('*.py'))))"]
 

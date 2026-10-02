@@ -641,6 +641,9 @@ def generer_dockerfile(image_digest: str | None, nom_projet: str) -> str:
         "RUN python mesures/eprouver_instruments.py",
         f"RUN python mesures/porte_qualite.py outils/*.py --racine /{nom_projet}",
         f"RUN python mesures/test_isolation.py outils --racine /{nom_projet}",
+        "RUN useradd --create-home --uid 10001 agent",
+        "USER agent",
+        "HEALTHCHECK NONE",
         'CMD ["python", "-c", "import pathlib; print(chr(10).join(sorted(p.stem for p in pathlib.Path(\'outils\').glob(\'*.py\'))))"]',
         "",
     ]
@@ -698,6 +701,8 @@ def generer_workflow(version_python: str) -> str:
     lines = [
         "name: verifier",
         "on: [push, pull_request]",
+        "permissions:",
+        "  contents: read",
         "jobs:",
         "  verifier:",
         "    runs-on: ubuntu-latest",

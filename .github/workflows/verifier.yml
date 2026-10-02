@@ -1,5 +1,7 @@
 name: verifier
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   verifier:
     runs-on: ubuntu-latest
